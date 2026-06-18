@@ -12,9 +12,16 @@ class AnalyticsQuery extends Model
     protected $fillable = [
         'user_id',
         'organization_id',
+        'session_id',
         'question',
         'sql',
+        'ai_response',
         'row_count',
+        'result_columns',
+    ];
+
+    protected $casts = [
+        'result_columns' => 'array',
     ];
 
     public function user()
@@ -25,5 +32,10 @@ class AnalyticsQuery extends Model
     public function organization()
     {
         return $this->belongsTo(Organization::class);
+    }
+
+    public function session()
+    {
+        return $this->belongsTo(AnalyticsSession::class, 'session_id');
     }
 }

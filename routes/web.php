@@ -29,6 +29,12 @@ Route::middleware('auth')->group(function () {
         ->name('dashboard.analytics.ask')
         ->middleware(['check.org']);
 
+    Route::get('/dashboard/analytics/session/{session}', [ChatAnalyticsController::class, 'showSession'])
+        ->name('dashboard.analytics.session');
+
+    Route::delete('/dashboard/analytics/session/{session}', [ChatAnalyticsController::class, 'destroySession'])
+        ->name('dashboard.analytics.session.destroy');
+
     Route::post('/dashboard/analytics/export', [ChatAnalyticsController::class, 'export'])
         ->name('dashboard.analytics.export')
         ->middleware(['check.org']);

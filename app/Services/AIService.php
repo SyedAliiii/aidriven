@@ -22,27 +22,30 @@ class AIService
      *
      * @return string Either raw SELECT SQL or `ERROR: Unauthorized Action`
      */
-    public function generateQuery(string $userPrompt, int $orgId): string
+    public function generateQuery(string $userPrompt, int $orgId, array $chatHistory = []): string
     {
         $organization = Organization::findOrFail($orgId);
         $this->databaseConnectionService->connectForOrganization($organization);
 
-        $fullSchema = $this->introspectSchemaMetadata();
-        $schemaMetadata = $this->buildRelevantSchemaContext(
-            userPrompt: $userPrompt,
-            schemaByTable: $fullSchema,
-        );
-
         $settings = AISettings::current();
         $guideContext = $this->buildGuideContext(AIGuide::current());
 
+        $historyContext = $this->buildChatHistoryContext($chatHistory);
+
+        $fullSchema = $this->introspectSchemaMetadata();
+        $schemaMetadata = $this->buildRelevantSchemaContext(
+            userPrompt: $userPrompt . "\n" . $historyContext,
+            schemaByTable: $fullSchema,
+            guideContext: $guideContext,
+        );
+
         return match ($settings->provider) {
-            'openai' => $this->generateWithOpenAI($userPrompt, $schemaMetadata, $guideContext, $settings),
-            default => $this->generateWithGemini($userPrompt, $schemaMetadata, $guideContext, $settings),
+            'openai' => $this->generateWithOpenAI($userPrompt, $schemaMetadata, $guideContext, $historyContext, $settings),
+            default => $this->generateWithGemini($userPrompt, $schemaMetadata, $guideContext, $historyContext, $settings),
         };
     }
 
-    private function generateWithGemini(string $userPrompt, string $schemaMetadata, string $guideContext, AISettings $settings): string
+    private function generateWithGemini(string $userPrompt, string $schemaMetadata, string $guideContext, string $historyContext, AISettings $settings): string
     {
         $apiKey = config('gemini.api_key');
         if (blank($apiKey)) {
@@ -54,22 +57,17 @@ class AIService
         $verifySsl = (bool) config('gemini.verify_ssl', true);
         $caBundle = config('gemini.ca_bundle');
 
-        $systemInstruction = "You are a MySQL expert for business analytics.\n"
-            . "You can understand user questions in any language (including Urdu, Roman Urdu, Hindi, and English).\n"
-            . "Map business terms like executed sale, non executed, absent TSO, today/yesterday, month-to-date.\n"
-            . "First identify relevant tables/columns from the provided schema context.\n"
-            . "Then write a valid SQL query strictly according to available column names.\n"
-            . "Return ONLY the raw SQL string.\n"
-            . "No markdown, no '```sql', no explanations.\n"
-            . "Use LIMIT 100 by default.\n"
-            . "If the query contains DROP, DELETE, or UPDATE, return 'ERROR: Unauthorized Action'.\n\n"
-            . "IMPORTANT: If the user is just saying a casual greeting (like hi, hello, salam, etc.) or asking a question that is conversational/general and does not require database querying or reporting, do NOT write a SQL query. Instead, respond with a friendly conversational response prefixed with 'CONVERSATION: ' (e.g. 'CONVERSATION: Hello! How can I help you today?').\n\n"
-            . "Business guide (highest priority):\n"
-            . $guideContext;
+        $systemInstruction = $this->buildSystemInstruction($guideContext);
 
-        $userMessage = "Schema (MySQL):\n{$schemaMetadata}\n\n"
-            . "User question:\n{$userPrompt}\n\n"
-            . "Remember: return ONLY the raw SQL string (or a CONVERSATION: response if casual).";
+        $userMessage = "Schema (MySQL) — these are the ONLY tables and columns that exist:\n{$schemaMetadata}\n\n"
+            . "CRITICAL: You MUST use ONLY the exact column names listed above. "
+            . "Do NOT guess, assume, or invent column names. "
+            . "If you are unsure whether a column exists, choose the closest match from the schema or explain in a CONVERSATION response.\n\n"
+            . "Current user question: {$userPrompt}\n\n"
+            . "Return ONLY the raw SQL string, or a CONVERSATION: response if casual.";
+        $userMessage = "Global/business instructions are loaded in the system message. Follow them before generating SQL.\n\n"
+            . ($historyContext !== '' ? "Previous messages in this chat:\n{$historyContext}\n\n" : '')
+            . $userMessage;
 
         $httpOptions = ['timeout' => $timeout];
         if ($caBundle) {
@@ -100,7 +98,7 @@ class AIService
         return trim($generated);
     }
 
-    private function generateWithOpenAI(string $userPrompt, string $schemaMetadata, string $guideContext, AISettings $settings): string
+    private function generateWithOpenAI(string $userPrompt, string $schemaMetadata, string $guideContext, string $historyContext, AISettings $settings): string
     {
         $apiKey = config('openai.api_key');
         if (blank($apiKey)) {
@@ -113,22 +111,17 @@ class AIService
         $verifySsl = (bool) config('openai.verify_ssl', true);
         $caBundle = config('openai.ca_bundle');
 
-        $systemInstruction = "You are a MySQL expert for business analytics.\n"
-            . "You can understand user questions in any language (including Urdu, Roman Urdu, Hindi, and English).\n"
-            . "Map business terms like executed sale, non executed, absent TSO, today/yesterday, month-to-date.\n"
-            . "First identify relevant tables/columns from the provided schema context.\n"
-            . "Then write a valid SQL query strictly according to available column names.\n"
-            . "Return ONLY the raw SQL string.\n"
-            . "No markdown, no '```sql', no explanations.\n"
-            . "Use LIMIT 100 by default.\n"
-            . "If the query contains DROP, DELETE, or UPDATE, return 'ERROR: Unauthorized Action'.\n\n"
-            . "IMPORTANT: If the user is just saying a casual greeting (like hi, hello, salam, etc.) or asking a question that is conversational/general and does not require database querying or reporting, do NOT write a SQL query. Instead, respond with a friendly conversational response prefixed with 'CONVERSATION: ' (e.g. 'CONVERSATION: Hello! How can I help you today?').\n\n"
-            . "Business guide (highest priority):\n"
-            . $guideContext;
+        $systemInstruction = $this->buildSystemInstruction($guideContext);
 
-        $userMessage = "Schema (MySQL):\n{$schemaMetadata}\n\n"
-            . "User question:\n{$userPrompt}\n\n"
-            . "Remember: return ONLY the raw SQL string (or a CONVERSATION: response if casual).";
+        $userMessage = "Schema (MySQL) — these are the ONLY tables and columns that exist:\n{$schemaMetadata}\n\n"
+            . "CRITICAL: You MUST use ONLY the exact column names listed above. "
+            . "Do NOT guess, assume, or invent column names. "
+            . "If you are unsure whether a column exists, choose the closest match from the schema or explain in a CONVERSATION response.\n\n"
+            . "Current user question: {$userPrompt}\n\n"
+            . "Return ONLY the raw SQL string, or a CONVERSATION: response if casual.";
+        $userMessage = "Global/business instructions are loaded in the system message. Follow them before generating SQL.\n\n"
+            . ($historyContext !== '' ? "Previous messages in this chat:\n{$historyContext}\n\n" : '')
+            . $userMessage;
 
         $httpOptions = [
             'base_uri' => $baseUrl . '/',
@@ -178,9 +171,6 @@ class AIService
             }
         }
 
-        // Keep prompt size reasonable.
-        $tableNames = array_slice($tableNames, 0, 30);
-
         $schemaByTable = [];
 
         foreach ($tableNames as $tableName) {
@@ -228,9 +218,9 @@ class AIService
     /**
      * Searches schema first, then returns a prompt-sized relevant schema context.
      */
-    private function buildRelevantSchemaContext(string $userPrompt, array $schemaByTable): string
+    private function buildRelevantSchemaContext(string $userPrompt, array $schemaByTable, string $guideContext = ''): string
     {
-        $terms = $this->extractSearchTerms($userPrompt);
+        $terms = $this->extractSearchTerms($userPrompt . ' ' . $guideContext);
         $ranked = [];
 
         foreach ($schemaByTable as $table) {
@@ -265,9 +255,9 @@ class AIService
         $top = array_values(array_filter($ranked, static fn ($row) => $row['score'] > 0));
         if (empty($top)) {
             // Fallback: no keyword hit, include first few tables so AI can still respond.
-            $top = array_slice($ranked, 0, 8);
+            $top = array_slice($ranked, 0, 12);
         } else {
-            $top = array_slice($top, 0, 12);
+            $top = array_slice($top, 0, 20);
         }
 
         $lines = [];
@@ -280,6 +270,31 @@ class AIService
         }
 
         return implode("\n", $lines);
+    }
+
+    private function buildChatHistoryContext(array $chatHistory): string
+    {
+        $lines = [];
+
+        foreach ($chatHistory as $index => $item) {
+            $question = trim((string) ($item['question'] ?? ''));
+            $reply = trim((string) ($item['reply'] ?? ''));
+            $sql = trim((string) ($item['sql'] ?? ''));
+
+            if ($question === '') {
+                continue;
+            }
+
+            $lines[] = 'Turn ' . ($index + 1) . ':';
+            $lines[] = 'User: ' . mb_substr($question, 0, 500);
+            if ($sql !== '') {
+                $lines[] = 'SQL: ' . mb_substr($sql, 0, 1200);
+            } elseif ($reply !== '') {
+                $lines[] = 'Assistant: ' . mb_substr($reply, 0, 500);
+            }
+        }
+
+        return trim(implode("\n", $lines));
     }
 
     private function extractSearchTerms(string $text): array
@@ -312,7 +327,7 @@ class AIService
     /**
      * Enforces SELECT-only and removes markdown/code fences.
      */
-    public function sanitizeGeneratedQuery(string $sql): string
+    public function sanitizeGeneratedQuery(string $sql, bool $addDefaultLimit = true): string
     {
         $sql = trim($sql);
         if ($sql === '') {
@@ -343,8 +358,8 @@ class AIService
             return 'ERROR: Unauthorized Action';
         }
 
-        // Default LIMIT 100 if model didn't include one.
-        if (!preg_match('/\bLIMIT\b/i', $withoutTrailingSemi)) {
+        // Default LIMIT 100 if model didn't include one and the user did not ask for full data.
+        if ($addDefaultLimit && !preg_match('/\bLIMIT\b/i', $withoutTrailingSemi)) {
             $withoutTrailingSemi = rtrim($withoutTrailingSemi) . ' LIMIT 100';
         }
 
@@ -414,5 +429,37 @@ class AIService
 
         return trim(implode("\n", $lines));
     }
-}
 
+    /**
+     * Shared, hardened system instruction for all AI providers.
+     */
+    private function buildSystemInstruction(string $guideContext): string
+    {
+        return "You are a MySQL expert assistant for business analytics.\n"
+            . "You understand questions in English, Urdu, Roman Urdu, and Hindi.\n"
+            . "Map business terms such as: executed sale, non executed, absent TSO, today/yesterday, month-to-date, active, inactive, etc.\n\n"
+            . "STRICT SCHEMA RULES (MOST IMPORTANT):\n"
+            . "1. You will receive the database schema listing every table and every column that EXISTS.\n"
+            . "2. You MUST ONLY use table names and column names that are EXPLICITLY listed in the schema provided.\n"
+            . "3. NEVER guess, infer, or invent column names. If a column you need is not in the schema, do NOT use it.\n"
+            . "4. If the user asks about something (e.g. 'active users') and the schema does not have an obvious column for it, "
+            . "use the closest available column from the schema, or ask for clarification via a CONVERSATION response.\n"
+            . "5. Before writing any WHERE clause, JOIN condition, or SELECT column, mentally verify that each column name "
+            . "appears EXACTLY in the schema provided. If not, remove or replace it.\n"
+            . "6. If the user asks for a name (route name, product name, shop name, distributor name, order booker name), "
+            . "prefer a real name/title column from the related table. Do not return only an ID column unless the schema has no matching name/title column.\n"
+            . "7. If the current user message is a short follow-up such as 'recheck', 'ismn add kro', 'same me', or 'sab dikhao', "
+            . "treat it as a modification of the previous query in this chat. Reuse the previous filters, dates, joins, and intent unless the user clearly changes them.\n"
+            . "8. If the user asks to add columns to the current result, keep the previous query filters and add the requested columns instead of starting a new broad query.\n\n"
+            . "SQL OUTPUT RULES:\n"
+            . "- Return ONLY the raw SQL string. No markdown, no \"```sql\", no explanations.\n"
+            . "- Use LIMIT 100 by default unless the user asks for full/all records, complete data, no limit, not only 100, or 'sab dikhao'. In that case, do not add LIMIT.\n"
+            . "- If the query would require DROP, DELETE, UPDATE, TRUNCATE, or INSERT, return exactly: ERROR: Unauthorized Action\n\n"
+            . "CONVERSATION RULE:\n"
+            . "If the user is sending a casual greeting (hi, hello, salam, etc.) or asking a general/non-data question, "
+            . "do NOT write SQL. Respond with a friendly message prefixed with 'CONVERSATION: ' "
+            . "(e.g. 'CONVERSATION: Hello! How can I help you with your analytics today?').\n\n"
+            . "Business guide (follow these mappings at highest priority):\n"
+            . $guideContext;
+    }
+}
