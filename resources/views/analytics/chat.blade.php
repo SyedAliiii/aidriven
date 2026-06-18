@@ -37,7 +37,7 @@
     </style>
 
     <div class="h-[calc(100vh-4rem)] bg-gray-50 dark:bg-gray-950">
-        <div class="h-full max-w-7xl mx-auto flex">
+        <div class="h-full mx-auto flex">
 
             {{-- ============================================================ --}}
             {{-- Sidebar --}}
