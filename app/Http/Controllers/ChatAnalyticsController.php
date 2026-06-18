@@ -72,21 +72,53 @@ class ChatAnalyticsController extends Controller
         $organization = Organization::findOrFail($organizationId);
 
         try {
-            $generatedSql = $this->aiService->generateQuery(
+            $generatedResult = $this->aiService->generateQuery(
                 userPrompt: $validated['question'],
                 orgId: (int) $organization->id,
             );
 
-            if ($generatedSql === 'ERROR: Unauthorized Action') {
+            // Clean the generated result from markdown blocks if any
+            $cleanedResult = trim($generatedResult);
+            $cleanedResult = preg_replace('/^```(?:sql)?\s*/i', '', $cleanedResult) ?? $cleanedResult;
+            $cleanedResult = preg_replace('/```$/', '', $cleanedResult) ?? $cleanedResult;
+            $cleanedResult = trim($cleanedResult);
+
+            // Check if it's a conversation or greeting
+            $isConversation = false;
+            if (str_starts_with($cleanedResult, 'CONVERSATION:')) {
+                $isConversation = true;
+                $message = trim(substr($cleanedResult, strlen('CONVERSATION:')));
+            } elseif (!$this->aiService->startsWithSelect($cleanedResult)) {
+                // If it doesn't start with SELECT, it's not a query, so treat it as conversation
+                $isConversation = true;
+                $message = $cleanedResult;
+            }
+
+            if ($isConversation) {
+                // Create history record for conversation
+                $historyItem = AnalyticsQuery::create([
+                    'user_id' => $user->id,
+                    'organization_id' => $organization->id,
+                    'question' => $validated['question'],
+                    'sql' => null,
+                    'row_count' => 0,
+                ]);
+
                 return response()->json([
-                    'message' => 'This question would require unauthorized database operations.',
+                    'message' => $message,
                     'raw_sql' => null,
                     'columns' => [],
                     'rows' => [],
-                ], 422);
+                    'is_conversation' => true,
+                    'history_item' => [
+                        'question' => $historyItem->question,
+                        'created_at' => $historyItem->created_at->format('d M, H:i'),
+                        'organization_name' => $organization->name,
+                    ]
+                ]);
             }
 
-            $safeSql = $this->aiService->sanitizeGeneratedQuery($generatedSql);
+            $safeSql = $this->aiService->sanitizeGeneratedQuery($cleanedResult);
             if ($safeSql === 'ERROR: Unauthorized Action') {
                 return response()->json([
                     'message' => 'Only SELECT queries are allowed for safety.',
@@ -111,7 +143,7 @@ class ChatAnalyticsController extends Controller
                 str_contains($errorMessage, 'password is NULL or empty') =>
                     'Selected organization DB password is empty. Please update it from Organizations module.',
                 str_contains($errorMessage, 'cURL error 60') =>
-                    'Gemini SSL verification failed on this machine. Set GEMINI_VERIFY_SSL=false for local development, or configure GEMINI_CA_BUNDLE.',
+                    'SSL verification failed on this machine. Set GEMINI_VERIFY_SSL=false or OPENAI_VERIFY_SSL=false in your .env for local development, or configure the appropriate CA bundle.',
                 default =>
                     'Failed to generate a safe SQL query. Please refine your question.',
             };
@@ -132,7 +164,7 @@ class ChatAnalyticsController extends Controller
             $rows = array_map(static fn ($row) => (array) $row, $results);
             $columns = empty($rows) ? [] : array_keys($rows[0]);
 
-            AnalyticsQuery::create([
+            $historyItem = AnalyticsQuery::create([
                 'user_id' => $user->id,
                 'organization_id' => $organization->id,
                 'question' => $validated['question'],
@@ -145,6 +177,11 @@ class ChatAnalyticsController extends Controller
                 'raw_sql' => $safeSql,
                 'columns' => $columns,
                 'rows' => $rows,
+                'history_item' => [
+                    'question' => $historyItem->question,
+                    'created_at' => $historyItem->created_at->format('d M, H:i'),
+                    'organization_name' => $organization->name,
+                ]
             ]);
         } catch (Throwable $e) {
             Log::error('Analytics ask query execution failed', [

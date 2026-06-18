@@ -1,4 +1,19 @@
 <x-app-layout>
+    <style>
+        @keyframes pulse-dots {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .typing-dot {
+            animation: pulse-dots 1.4s infinite both;
+        }
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+    </style>
     @php
         $user = auth()->user();
         $isSuperAdmin = $user && method_exists($user, 'hasRole') ? $user->hasRole('super-admin') : false;
@@ -29,7 +44,7 @@
                     </button>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-2 space-y-1 text-sm">
+                <div id="desktop-history-container" class="flex-1 overflow-y-auto p-2 space-y-1 text-sm">
                     @forelse($history as $item)
                         <button type="button"
                                 class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-800 dark:text-gray-100 truncate"
@@ -225,7 +240,7 @@
             </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-2 space-y-1 text-sm">
+        <div id="mobile-history-container" class="flex-1 overflow-y-auto p-2 space-y-1 text-sm">
             @forelse($history as $item)
                 <button type="button"
                         class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-800 dark:text-gray-100"
@@ -371,6 +386,76 @@
                 }
             }
 
+            let typingIndicatorEl = null;
+
+            function showTypingIndicator() {
+                removeTypingIndicator();
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex justify-start';
+                wrapper.id = 'ai-typing-indicator';
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'max-w-[80%] rounded-2xl px-4 py-3 bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 flex items-center space-x-1';
+                bubble.innerHTML = '<span class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></span>' +
+                                   '<span class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></span>' +
+                                   '<span class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></span>';
+                
+                wrapper.appendChild(bubble);
+                chatMessages.appendChild(wrapper);
+                typingIndicatorEl = wrapper;
+
+                if (chatScroll) {
+                    chatScroll.scrollTop = chatScroll.scrollHeight;
+                }
+            }
+
+            function removeTypingIndicator() {
+                if (typingIndicatorEl && typingIndicatorEl.parentNode) {
+                    typingIndicatorEl.parentNode.removeChild(typingIndicatorEl);
+                }
+                typingIndicatorEl = null;
+            }
+
+            function appendHistoryItem(item) {
+                if (!item || !item.question) return;
+                
+                const questionHtml = escapeHtml(item.question);
+                const shortQuestion = questionHtml.length > 60 ? questionHtml.substring(0, 60) + '...' : questionHtml;
+                const orgNameHtml = item.organization_name ? escapeHtml(item.organization_name.length > 14 ? item.organization_name.substring(0, 14) + '...' : item.organization_name) : '';
+                
+                const btnHtml = '<button type="button" class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-800 dark:text-gray-100 truncate" data-question="' + escapeHtml(item.question) + '">' +
+                    '<div class="truncate">' + shortQuestion + '</div>' +
+                    '<div class="mt-0.5 text-[10px] text-gray-500 dark:text-gray-400 flex items-center justify-between">' +
+                        '<span>' + escapeHtml(item.created_at || '') + '</span>' +
+                        (orgNameHtml ? '<span>' + orgNameHtml + '</span>' : '') +
+                    '</div>' +
+                '</button>';
+
+                const desktopContainer = document.getElementById('desktop-history-container');
+                const mobileContainer = document.getElementById('mobile-history-container');
+
+                function insertInto(container) {
+                    if (!container) return;
+                    const p = container.querySelector('p');
+                    if (p) p.remove(); // Remove "No history yet" message
+                    container.insertAdjacentHTML('afterbegin', btnHtml);
+                    
+                    // Bind click event to new button
+                    const newBtn = container.firstElementChild;
+                    newBtn.addEventListener('click', function () {
+                        const q = this.getAttribute('data-question') || '';
+                        if (q && questionEl) {
+                            questionEl.value = q;
+                            questionEl.focus();
+                        }
+                        closeMobileHistory();
+                    });
+                }
+
+                insertInto(desktopContainer);
+                insertInto(mobileContainer);
+            }
+
             if (newChatBtn) {
                 newChatBtn.addEventListener('click', function () {
                     chatMessages.innerHTML = '';
@@ -451,8 +536,9 @@
 
                 setMessage('', false);
                 setAskButtonEnabled(false);
-                askStatus.textContent = 'Generating and executing...';
+                askStatus.textContent = '';
                 appendMessage('user', question);
+                showTypingIndicator();
 
                 try {
                     const resp = await fetch(askUrl, {
@@ -476,6 +562,7 @@
                     }
 
                     if (!resp.ok) {
+                        removeTypingIndicator();
                         setMessage(data.message || 'Request failed.', true);
                         sqlOutput.value = '';
                         copySqlBtn.disabled = true;
@@ -492,6 +579,7 @@
                     }
 
                     // Success
+                    removeTypingIndicator();
                     askStatus.textContent = '';
                     setMessage('', false);
 
@@ -499,22 +587,36 @@
                     const rows = data.rows || [];
                     const rawSql = data.raw_sql || '';
 
-                    sqlOutput.value = rawSql;
-                    exportOrgId.value = orgId || '';
-                    exportSql.value = rawSql;
+                    if (data.is_conversation) {
+                        sqlOutput.value = '';
+                        exportOrgId.value = '';
+                        exportSql.value = '';
+                        copySqlBtn.disabled = true;
+                        exportBtn.disabled = true;
+                        renderTable([], []);
+                        appendMessage('assistant', data.message);
+                    } else {
+                        sqlOutput.value = rawSql;
+                        exportOrgId.value = orgId || '';
+                        exportSql.value = rawSql;
 
-                    copySqlBtn.disabled = false;
-                    exportBtn.disabled = false;
+                        copySqlBtn.disabled = false;
+                        exportBtn.disabled = false;
 
-                    renderTable(columns, rows);
+                        renderTable(columns, rows);
 
-                    const answerSummary = (data.message || 'Success') +
-                        (rows.length ? ` — ${rows.length} row(s)` : '');
-                    appendMessage('assistant', answerSummary);
+                        const answerSummary = (data.message || 'Success') +
+                            (rows.length ? ` — ${rows.length} row(s)` : '');
+                        appendMessage('assistant', answerSummary);
+                    }
 
+                    if (data.history_item) {
+                        appendHistoryItem(data.history_item);
+                    }
                     setAskButtonEnabled(true);
                 } catch (err) {
                     console.error(err);
+                    removeTypingIndicator();
                     askStatus.textContent = '';
                     setMessage('Failed to call the server.', true);
                     setAskButtonEnabled(true);

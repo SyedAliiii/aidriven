@@ -63,12 +63,13 @@ class AIService
             . "No markdown, no '```sql', no explanations.\n"
             . "Use LIMIT 100 by default.\n"
             . "If the query contains DROP, DELETE, or UPDATE, return 'ERROR: Unauthorized Action'.\n\n"
+            . "IMPORTANT: If the user is just saying a casual greeting (like hi, hello, salam, etc.) or asking a question that is conversational/general and does not require database querying or reporting, do NOT write a SQL query. Instead, respond with a friendly conversational response prefixed with 'CONVERSATION: ' (e.g. 'CONVERSATION: Hello! How can I help you today?').\n\n"
             . "Business guide (highest priority):\n"
             . $guideContext;
 
         $userMessage = "Schema (MySQL):\n{$schemaMetadata}\n\n"
             . "User question:\n{$userPrompt}\n\n"
-            . "Remember: return ONLY the raw SQL string.";
+            . "Remember: return ONLY the raw SQL string (or a CONVERSATION: response if casual).";
 
         $httpOptions = ['timeout' => $timeout];
         if ($caBundle) {
@@ -96,7 +97,7 @@ class AIService
 
         $generated = $response->text();
 
-        return $this->sanitizeGeneratedQuery($generated);
+        return trim($generated);
     }
 
     private function generateWithOpenAI(string $userPrompt, string $schemaMetadata, string $guideContext, AISettings $settings): string
@@ -109,6 +110,8 @@ class AIService
         $baseUrl = rtrim(config('openai.base_url', 'https://api.openai.com/v1'), '/');
         $model = $settings->openai_model ?: config('openai.model', 'gpt-4.1-mini');
         $timeout = (int) config('openai.timeout', 60);
+        $verifySsl = (bool) config('openai.verify_ssl', true);
+        $caBundle = config('openai.ca_bundle');
 
         $systemInstruction = "You are a MySQL expert for business analytics.\n"
             . "You can understand user questions in any language (including Urdu, Roman Urdu, Hindi, and English).\n"
@@ -119,17 +122,25 @@ class AIService
             . "No markdown, no '```sql', no explanations.\n"
             . "Use LIMIT 100 by default.\n"
             . "If the query contains DROP, DELETE, or UPDATE, return 'ERROR: Unauthorized Action'.\n\n"
+            . "IMPORTANT: If the user is just saying a casual greeting (like hi, hello, salam, etc.) or asking a question that is conversational/general and does not require database querying or reporting, do NOT write a SQL query. Instead, respond with a friendly conversational response prefixed with 'CONVERSATION: ' (e.g. 'CONVERSATION: Hello! How can I help you today?').\n\n"
             . "Business guide (highest priority):\n"
             . $guideContext;
 
         $userMessage = "Schema (MySQL):\n{$schemaMetadata}\n\n"
             . "User question:\n{$userPrompt}\n\n"
-            . "Remember: return ONLY the raw SQL string.";
+            . "Remember: return ONLY the raw SQL string (or a CONVERSATION: response if casual).";
 
-        $client = new GuzzleClient([
+        $httpOptions = [
             'base_uri' => $baseUrl . '/',
             'timeout' => $timeout,
-        ]);
+        ];
+        if ($caBundle) {
+            $httpOptions['verify'] = $caBundle;
+        } else {
+            $httpOptions['verify'] = $verifySsl;
+        }
+
+        $client = new GuzzleClient($httpOptions);
 
         $response = $client->post('chat/completions', [
             'headers' => [
@@ -149,7 +160,7 @@ class AIService
         $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $generated = $data['choices'][0]['message']['content'] ?? '';
 
-        return $this->sanitizeGeneratedQuery($generated);
+        return trim($generated);
     }
 
     /**
@@ -340,7 +351,7 @@ class AIService
         return trim($withoutTrailingSemi) . ';';
     }
 
-    private function startsWithSelect(string $sql): bool
+    public function startsWithSelect(string $sql): bool
     {
         // Strip leading whitespace and common comments.
         $normalized = ltrim($sql);
