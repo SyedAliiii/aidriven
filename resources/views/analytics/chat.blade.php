@@ -35,6 +35,176 @@
   .aq-export-btn{margin-top:10px;display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:7px;font-size:.75rem;font-weight:600;cursor:pointer;border:none;background:#111827;color:#fff;transition:opacity .14s;}
   .aq-export-btn:hover{opacity:.85;}
   .aq-export-btn+.aq-export-btn{margin-left:6px;}
+  #aq-hbtn,#aq-topbar .topbar-sep:first-of-type{display:none !important;}
+
+  
+  /* ── Remove ALL blue focus rings / outlines ── */
+  *:focus { outline: none !important; box-shadow: none !important; }
+  input:focus, textarea:focus, select:focus, button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  #aq-search:focus { outline: none !important; box-shadow: none !important; }
+  #aq-q:focus      { outline: none !important; box-shadow: none !important; }
+  #aq-search-wrap:focus-within {
+    border-color: rgba(255,255,255,.15) !important;
+    background: rgba(255,255,255,.07) !important;
+    box-shadow: none !important;
+  }
+  #aq-box:focus-within        { outline: none !important; box-shadow: none !important; }
+  #aq-box textarea:focus      { outline: none !important; box-shadow: none !important; }
+
+
+/* ── Sidebar LIGHT in light mode (default) ── */
+#aq-sidebar {
+  background: #ffffff !important;
+  border-right-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+#aq-sidebar .brand-name,
+#aq-sidebar .sb-section {
+  color: #111827 !important;
+}
+
+#aq-sidebar .hbtn-sb {
+  color: #374151 !important;
+  background: transparent !important;
+}
+#aq-sidebar .hbtn-sb:hover {
+  background: rgba(0, 0, 0, 0.06) !important;
+  color: #111827 !important;
+}
+#aq-sidebar .hbtn-sb.active {
+  background: rgba(0, 0, 0, 0.09) !important;
+  color: #111827 !important;
+}
+
+#aq-sidebar .htime {
+  color: #6b7280 !important;
+}
+
+#aq-search-wrap {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+#aq-search {
+  color: #111827 !important;
+}
+
+#aq-sidebar .new-qbtn {
+  background: #111827 !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+#aq-sidebar .sb-orb3 {
+  opacity: 0.05 !important;
+}
+
+/* ── Sidebar DARK in dark mode ── */
+[data-theme="dark"] #aq-sidebar {
+  background: #0f172a !important;
+  border-right-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] #aq-sidebar .brand-name,
+[data-theme="dark"] #aq-sidebar .sb-section {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="dark"] #aq-sidebar .hbtn-sb {
+  color: rgba(255, 255, 255, 0.75) !important;
+  background: transparent !important;
+}
+[data-theme="dark"] #aq-sidebar .hbtn-sb:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+}
+[data-theme="dark"] #aq-sidebar .hbtn-sb.active {
+  background: rgba(255, 255, 255, 0.09) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] #aq-sidebar .htime {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+[data-theme="dark"] #aq-search-wrap {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] #aq-search {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+[data-theme="dark"] #aq-sidebar .new-qbtn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] #aq-sidebar .sb-orb3 {
+  opacity: 1 !important;
+}
+/* icon tail  */
+
+/* ── Rail LIGHT in light mode ── */
+#aq-rail {
+  background: #ffffff !important;
+  border-right-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+#aq-rail .rail-btn svg {
+  stroke: #374151 !important;
+}
+
+#aq-rail .rail-btn:hover {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+#aq-rail .rail-btn.active {
+  background: rgba(0, 0, 0, 0.09) !important;
+}
+
+#aq-rail .rail-divider {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+#aq-rail .rail-logo svg {
+  /* stroke: #374151 !important; */
+    stroke: #fff !important;
+}
+
+#aq-rail .rail-avatar {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+  color: #ffffff !important;
+}
+
+/* ── Rail DARK in dark mode ── */
+[data-theme="dark"] #aq-rail {
+  background: #0f172a !important;
+  border-right-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] #aq-rail .rail-btn svg {
+  stroke: rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme="dark"] #aq-rail .rail-btn:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+[data-theme="dark"] #aq-rail .rail-btn.active {
+  background: rgba(255, 255, 255, 0.09) !important;
+}
+
+[data-theme="dark"] #aq-rail .rail-divider {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] #aq-rail .rail-logo svg {
+  stroke: rgba(255, 255, 255, 0.7) !important;
+}
 </style>
 
 <div id="aq-shell">
@@ -42,10 +212,13 @@
   {{-- ════ ICON RAIL ════ --}}
   <nav id="aq-rail" aria-label="Quick actions">
 
-    {{-- Logo --}}
-    <div class="rail-logo" title="Analytics">
-      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-    </div>
+    {{-- Hamburger (replaces old chat logo) --}}
+    <button type="button" class=" rail-logo"  id="aq-rail-hamburgertop"
+      aria-label="Toggle sidebar"
+      style="margin-bottom:2px;"
+      onclick="document.getElementById('aq-hbtn').click()">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
 
     <div class="rail-divider"></div>
 
@@ -84,11 +257,10 @@
       <svg id="aq-theme-moon" viewBox="0 0 24 24" style="display:none;"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
     </button>
 
-    {{-- Avatar + Dropdown (only user identity element — no duplicate row in the full sidebar) --}}
+    {{-- Avatar + Dropdown --}}
     <div style="position:relative;z-index:1;" id="aq-user-wrap">
       <div class="rail-avatar" id="aq-user-btn" title="{{ $userName }}">{{ $initials ?: 'U' }}</div>
 
-      {{-- Dropdown menu --}}
       <div id="aq-user-menu" style="
         display:none;
         position:fixed;
@@ -103,7 +275,6 @@
         z-index:9999;
         animation:fade-up .15s ease both;
       ">
-        {{-- User info header --}}
         <div style="padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07);">
           <div style="display:flex;align-items:center;gap:9px;">
             <div style="
@@ -122,7 +293,6 @@
           </div>
         </div>
 
-        {{-- Menu items --}}
         <a href="{{ route('profile.edit') }}" style="
           display:flex;align-items:center;gap:9px;
           padding:10px 14px;font-size:12.5px;color:#94a3b8;
@@ -178,7 +348,7 @@
         <div id="aq-search-wrap" style="display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);transition:border-color .15s,background .15s;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           <input id="aq-search" type="text" placeholder="Search history…"
-            style="background:transparent;border:none;outline:none;font-size:12.5px;color:rgba(255,255,255,.7);width:100%;font-family:inherit;">
+            style="background:transparent;border:none;outline:none;box-shadow:none;font-size:12.5px;color:rgba(255,255,255,.7);width:100%;font-family:inherit;">
         </div>
       </div>
 
@@ -202,10 +372,6 @@
         </div>
         <p id="aq-search-empty" style="display:none;font-size:12px;color:rgba(255,255,255,.28);padding:10px 11px;">No matches found.</p>
       </div>
-
-      {{-- NOTE: the duplicate "avatar + Test User" row that used to sit here has been
-           removed — the rail avatar above (with its Profile / Log Out dropdown) is now
-           the single source of truth for the signed-in user, so it isn't shown twice. --}}
 
     </div>
   </aside>
@@ -474,8 +640,9 @@
     Q('aq-hist-empty')?.style && (Q('aq-hist-empty').style.display='none');
     if(searchEmpty)searchEmpty.style.display=(v&&!anyVisible)?'block':'none';
   });
-  searchEl?.addEventListener('focus',()=>{if(searchWrap)searchWrap.style.borderColor='var(--accent,#4f46e5)';});
-  searchEl?.addEventListener('blur',()=>{if(searchWrap)searchWrap.style.borderColor='rgba(255,255,255,.08)';});
+  /* neutral focus — no blue border */
+  searchEl?.addEventListener('focus',()=>{if(searchWrap)searchWrap.style.borderColor='rgba(255,255,255,.15)';});
+  searchEl?.addEventListener('blur', ()=>{if(searchWrap)searchWrap.style.borderColor='rgba(255,255,255,.08)';});
 
   /* ── textarea resize ── */
   function resize(){qEl.style.height='auto';qEl.style.height=Math.min(qEl.scrollHeight,160)+'px';}
@@ -613,7 +780,7 @@
   }
   function removeTyping(){typing?.remove();typing=null;}
 
-  /* ── SQL-panel table (Advanced panel) ── */
+  /* ── SQL-panel table ── */
   function renderTable(cols,rows){
     thead.innerHTML='';tbody.innerHTML='';
     empty.style.display='none';rtable.style.display='none';badge.style.display='none';
@@ -713,7 +880,6 @@
         document.querySelectorAll(`.hbtn-sb[data-session-id="${sid}"]`).forEach(x=>x.classList.add('active'));
         if(window.innerWidth<768){sbOpen=false;applySB();}
       } else {
-        // fallback: fill textarea (no session id)
         if(qEl){qEl.value=b.dataset.q||'';resize();qEl.focus();}
         document.querySelectorAll('.hbtn-sb').forEach(x=>x.classList.remove('active'));
         b.classList.add('active');
@@ -763,7 +929,6 @@
       }
       status.textContent='';setMsg('',false);
 
-      // Track session
       if(d.session_id)currentSessionId=d.session_id;
       if(d.is_new_session&&d.session_id){
         prependSession(d.session_id,d.session_title,d.session_created_at,d.organization_name);

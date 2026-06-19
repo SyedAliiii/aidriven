@@ -54,7 +54,7 @@
 <nav id="aq-navbar" x-data="{ open: false }"
   class="sticky top-0 z-30 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 backdrop-blur-md">
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class=" mx-auto px-4 sm:px-6 lg:px-4">
         <div class="relative flex items-center h-14">
 
             {{-- Logo --}}
@@ -62,8 +62,8 @@
                 <x-application-logo class="block h-8 w-auto fill-current text-gray-800 dark:text-gray-100" />
             </a>
 
-            {{-- Desktop Nav Links — centered --}}
-            <div class="hidden sm:flex items-center gap-1 mx-auto">
+            {{-- Desktop Nav Links — truly centered --}}
+            <div class="hidden sm:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
                 <a href="{{ route('dashboard') }}"
                     class="px-3 py-1.5 rounded-md text-sm font-medium transition
                         {{ request()->routeIs('dashboard') && !request()->routeIs('dashboard.analytics.*')
