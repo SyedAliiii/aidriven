@@ -8,6 +8,7 @@
         $sessionUrl = route('dashboard.analytics.session', ['session' => '__ID__']);
         $deleteSessionUrl = route('dashboard.analytics.session.destroy', ['session' => '__ID__']);
         $exportUrl = route('dashboard.analytics.export');
+        $pdfUrl = route('dashboard.analytics.pdf');
     @endphp
 
     <style>
@@ -34,6 +35,8 @@
         .ai-table-wrap { overflow-x:auto; max-width:100%; border-radius: 6px; margin-top: 6px; border: 1px solid rgba(0,0,0,0.06); }
         .dark .ai-table-wrap { border-color: rgba(255,255,255,0.08); }
         .ai-table-meta { margin-top: 8px; font-size: 0.7rem; color: #6b7280; }
+        .ai-chart-wrap { width:min(720px, 100%); height:340px; margin-top:10px; padding:12px; border:1px solid rgba(0,0,0,0.06); border-radius:6px; background:rgba(255,255,255,0.55); }
+        .dark .ai-chart-wrap { border-color: rgba(255,255,255,0.08); background:rgba(17,24,39,0.45); }
     </style>
 
     <div class="h-[calc(100vh-4rem)] bg-gray-50 dark:bg-gray-950">
@@ -251,6 +254,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
     (function () {
         const askForm       = document.getElementById('ask-form');
@@ -282,6 +286,7 @@
         const sessionUrlTemplate = @json($sessionUrl);
         const deleteSessionUrlTemplate = @json($deleteSessionUrl);
         const exportUrl = @json($exportUrl);
+        const pdfUrl = @json($pdfUrl);
 
         let currentSessionId = null;
         let cooldownTimerId  = null;
@@ -337,7 +342,7 @@
         }
 
         // ── message bubbles ───────────────────────────────────────────────────
-        // opts = { columns, rows, ai_response, historyMode, rowCount, sql, orgId }
+        // opts = { columns, rows, ai_response, historyMode, rowCount, sql, orgId, visualizationType, visualizationData, question }
         function appendMessage(role, text, opts) {
             hideSystemMessage();
             const w = document.createElement('div');
@@ -357,15 +362,32 @@
                 const historyCount = opts?.rowCount || 0;
                 const sql = opts?.sql || '';
                 const orgId = opts?.orgId || organizationEl?.value || '';
+                const question = opts?.question || '';
+                const wantsChart = /\b(chart|graph|trend|compare|comparison|breakdown|pie|bar)\b|graph bna|chart bna/i.test(question);
+                const visualizationType = opts?.visualizationType || (wantsChart ? 'chart' : 'table');
+                const visualizationData = opts?.visualizationData || null;
 
                 if (historyMode) {
                     // Session loaded from history — no rows available, just show saved response text
                     const p = document.createElement('p');
                     p.textContent = aiText || `Found ${historyCount} result(s). Open SQL panel to re-export.`;
                     b.appendChild(p);
-                    if (sql && historyCount > 0) {
+                    if (visualizationType === 'chart' && visualizationData) {
+                        b.appendChild(buildChartElement(visualizationData));
+                        b.appendChild(buildPdfButton(visualizationData, orgId, question || aiText || ''));
+                    } else if (sql && historyCount > 0) {
                         b.appendChild(buildExcelButton(sql, orgId));
                     }
+                } else if (visualizationType === 'chart' && visualizationData) {
+                    if (aiText) {
+                        const p = document.createElement('p');
+                        p.className = 'mb-2 font-medium';
+                        p.textContent = aiText;
+                        b.appendChild(p);
+                    }
+
+                    b.appendChild(buildChartElement(visualizationData));
+                    b.appendChild(buildPdfButton(visualizationData, orgId, question || aiText || ''));
                 } else if (rows.length > 0) {
                     // Live result with rows — show ai_response text above table
                     if (aiText) {
@@ -435,6 +457,57 @@
             return btn;
         }
 
+        function buildPdfButton(chartData, orgId, question) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'mt-3 ml-2 inline-flex items-center justify-center rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white transition hover:opacity-90 dark:bg-white dark:text-gray-900';
+            btn.textContent = 'Download PDF';
+            btn.addEventListener('click', () => submitPdf(chartData, orgId, question));
+            return btn;
+        }
+
+        function buildChartElement(chartData) {
+            const wrap = document.createElement('div');
+            wrap.className = 'ai-chart-wrap';
+            const canvas = document.createElement('canvas');
+            wrap.appendChild(canvas);
+            requestAnimationFrame(() => renderChart(canvas, chartData));
+            return wrap;
+        }
+
+        function renderChart(canvas, chartData) {
+            if (!window.Chart) {
+                const fallback = document.createElement('div');
+                fallback.className = 'text-xs text-gray-500 dark:text-gray-400';
+                fallback.textContent = 'Chart library is not available. You can still download the PDF report.';
+                canvas.replaceWith(fallback);
+                return;
+            }
+
+            new Chart(canvas, {
+                type: chartData.kind || 'bar',
+                data: {
+                    labels: chartData.labels || [],
+                    datasets: [{
+                        label: chartData.value_column || 'Value',
+                        data: chartData.values || [],
+                        borderColor: '#111827',
+                        backgroundColor: ['#111827', '#2563eb', '#059669', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#4b5563'],
+                        tension: 0.35,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true },
+                        title: { display: true, text: chartData.title || 'Analytics chart' },
+                    },
+                    scales: chartData.kind === 'pie' ? {} : { y: { beginAtZero: true } },
+                },
+            });
+        }
+
         function submitExcel(sql, orgId) {
             if (!sql || !orgId) {
                 setMessage('Excel export is not available for this result.', true);
@@ -450,6 +523,35 @@
                 ['_token', csrf],
                 ['organization_id', orgId],
                 ['sql', sql],
+            ].forEach(([name, value]) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+            form.remove();
+        }
+
+        function submitPdf(chartData, orgId, question) {
+            if (!chartData || !orgId) {
+                setMessage('PDF download is not available for this chart.', true);
+                return;
+            }
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = pdfUrl;
+            form.style.display = 'none';
+
+            [
+                ['_token', csrf],
+                ['organization_id', orgId],
+                ['question', question || ''],
+                ['chart', JSON.stringify(chartData)],
             ].forEach(([name, value]) => {
                 const input = document.createElement('input');
                 input.type = 'hidden';
@@ -561,6 +663,9 @@
                                 ai_response: msg.ai_response || msg.text,
                                 sql: msg.sql || '',
                                 orgId: data.organization_id || '',
+                                visualizationType: msg.visualization_type || 'table',
+                                visualizationData: msg.visualization_data || null,
+                                question: msg.text || '',
                             });
                         } else {
                             appendMessage('assistant', msg.ai_response || msg.text || 'No results found.');
@@ -780,6 +885,9 @@
                         ai_response: aiResponse,
                         sql: rawSql,
                         orgId: orgId || data.organization_id || '',
+                        visualizationType: data.visualization_type || data.visualizationType || 'table',
+                        visualizationData: data.visualization_data || data.visualizationData || null,
+                        question,
                     });
                 }
 
@@ -790,7 +898,7 @@
                 console.error(err);
                 removeTypingIndicator();
                 askStatus.textContent = '';
-                setMessage('Failed to call the server.', true);
+                setMessage(`Failed to call the server. ${err?.message ? escapeHtml(err.message) : ''}`, true);
                 setAskButtonEnabled(true);
             }
         }

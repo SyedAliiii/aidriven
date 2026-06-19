@@ -39,6 +39,10 @@ Route::middleware('auth')->group(function () {
         ->name('dashboard.analytics.export')
         ->middleware(['check.org']);
 
+    Route::post('/dashboard/analytics/pdf', [ChatAnalyticsController::class, 'downloadPdf'])
+        ->name('dashboard.analytics.pdf')
+        ->middleware(['check.org']);
+
     Route::resource('admin/organizations', OrganizationAdminController::class)
         ->names('admin.organizations')
         ->except(['show'])

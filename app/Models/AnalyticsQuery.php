@@ -18,10 +18,13 @@ class AnalyticsQuery extends Model
         'ai_response',
         'row_count',
         'result_columns',
+        'visualization_type',
+        'visualization_data',
     ];
 
     protected $casts = [
         'result_columns' => 'array',
+        'visualization_data' => 'array',
     ];
 
     public function user()

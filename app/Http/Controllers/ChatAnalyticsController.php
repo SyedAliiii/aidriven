@@ -75,6 +75,8 @@ class ChatAnalyticsController extends Controller
                     'columns'   => $query->result_columns ?? [],
                     'rows'      => [],   // we don't re-execute; JS will show count summary
                     'ai_response' => $query->ai_response,
+                    'visualization_type' => $query->visualization_type ?: 'table',
+                    'visualization_data' => $query->visualization_data,
                 ];
             } else {
                 // Conversational reply
@@ -271,6 +273,11 @@ class ChatAnalyticsController extends Controller
                 rowCount: count($rows),
                 columns: $columns,
             );
+            $visualization = $this->buildVisualizationPayload(
+                question: $validated['question'],
+                columns: $columns,
+                rows: $rows,
+            );
 
             AnalyticsQuery::create([
                 'user_id'         => $user->id,
@@ -281,14 +288,20 @@ class ChatAnalyticsController extends Controller
                 'ai_response'     => $aiResponse,
                 'row_count'       => count($rows),
                 'result_columns'  => $columns,
+                'visualization_type' => $visualization['type'],
+                'visualization_data' => $visualization['data'],
             ]);
+
+            $responseRows = $visualization['type'] === 'chart' ? [] : $rows;
 
             return response()->json([
                 'message'            => empty($rows) ? 'No results found.' : 'Success',
                 'ai_response'        => $aiResponse,
                 'raw_sql'            => $safeSql,
                 'columns'            => $columns,
-                'rows'               => $rows,
+                'rows'               => $responseRows,
+                'visualization_type' => $visualization['type'],
+                'visualization_data' => $visualization['data'],
                 'session_id'         => $session->id,
                 'is_new_session'     => $session->wasRecentlyCreated,
                 'session_title'      => $session->title,
@@ -374,6 +387,35 @@ class ChatAnalyticsController extends Controller
         }
     }
 
+    public function downloadPdf(Request $request)
+    {
+        $validated = $request->validate([
+            'organization_id' => ['required', 'integer', 'exists:organizations,id'],
+            'question' => ['nullable', 'string', 'max:2000'],
+            'chart' => ['required', 'string', 'max:50000'],
+        ]);
+
+        $chart = json_decode($validated['chart'], true);
+        if (!is_array($chart)) {
+            return response()->json([
+                'message' => 'Invalid chart data.',
+            ], 422);
+        }
+
+        $pdf = $this->buildSimplePdf(
+            title: 'AI Analytics Report',
+            question: (string) ($validated['question'] ?? ''),
+            chart: $chart,
+        );
+
+        $filename = 'analytics_chart_' . now()->format('Ymd_His') . '.pdf';
+
+        return response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
     private function isGeminiHighDemandError(string $errorMessage): bool
     {
         $normalized = strtolower($errorMessage);
@@ -409,6 +451,156 @@ class ChatAnalyticsController extends Controller
             : ' The table includes: ' . implode(', ', array_slice($columns, 0, 8)) . (count($columns) > 8 ? ', and more' : '') . '.';
 
         return "I found {$rowCount} matching result" . ($rowCount === 1 ? '' : 's') . " for: \"{$question}\"." . $columnSummary;
+    }
+
+    private function buildVisualizationPayload(string $question, array $columns, array $rows): array
+    {
+        if (!$this->shouldRenderChart($question) || count($rows) === 0 || count($columns) < 2) {
+            return ['type' => 'table', 'data' => null];
+        }
+
+        $numericColumns = [];
+        foreach ($columns as $column) {
+            foreach ($rows as $row) {
+                if (isset($row[$column]) && is_numeric($row[$column])) {
+                    $numericColumns[] = $column;
+                    break;
+                }
+            }
+        }
+
+        if (empty($numericColumns)) {
+            return ['type' => 'table', 'data' => null];
+        }
+
+        $labelColumns = array_values(array_filter(
+            $columns,
+            static fn (string $column) => !in_array($column, $numericColumns, true)
+        ));
+        $valueColumn = $numericColumns[0];
+        $limitedRows = array_slice($rows, 0, 20);
+
+        return [
+            'type' => 'chart',
+            'data' => [
+                'kind' => $this->detectChartKind($question),
+                'title' => Str::limit($question, 120),
+                'label_column' => implode(' / ', $labelColumns ?: [$columns[0]]),
+                'value_column' => $valueColumn,
+                'labels' => array_map(function (array $row) use ($labelColumns, $columns) {
+                    $parts = [];
+                    foreach (($labelColumns ?: [$columns[0]]) as $column) {
+                        $value = trim((string) ($row[$column] ?? ''));
+                        if ($value !== '') {
+                            $parts[] = $value;
+                        }
+                    }
+
+                    return implode(' - ', $parts);
+                }, $limitedRows),
+                'values' => array_map(static fn (array $row) => (float) ($row[$valueColumn] ?? 0), $limitedRows),
+            ],
+        ];
+    }
+
+    private function shouldRenderChart(string $question): bool
+    {
+        $normalized = mb_strtolower($question);
+
+        return str_contains($normalized, 'chart')
+            || str_contains($normalized, 'graph')
+            || str_contains($normalized, 'trend')
+            || str_contains($normalized, 'compare')
+            || str_contains($normalized, 'comparison')
+            || str_contains($normalized, 'breakdown')
+            || str_contains($normalized, 'pie')
+            || str_contains($normalized, 'bar')
+            || str_contains($normalized, 'line chart')
+            || str_contains($normalized, 'graph bna')
+            || str_contains($normalized, 'chart bna')
+            || str_contains($normalized, 'wise');
+    }
+
+    private function detectChartKind(string $question): string
+    {
+        $normalized = mb_strtolower($question);
+
+        if (str_contains($normalized, 'pie')) {
+            return 'pie';
+        }
+
+        if (str_contains($normalized, 'line') || str_contains($normalized, 'trend')) {
+            return 'line';
+        }
+
+        return 'bar';
+    }
+
+    private function buildSimplePdf(string $title, string $question, array $chart): string
+    {
+        $lines = [];
+        $lines[] = $title;
+        $lines[] = 'Generated: ' . now()->format('d M Y, H:i');
+        if ($question !== '') {
+            $lines[] = 'Question: ' . $question;
+        }
+        $lines[] = '';
+        $lines[] = 'Chart: ' . (string) ($chart['title'] ?? 'Analytics chart');
+        $lines[] = 'Type: ' . strtoupper((string) ($chart['kind'] ?? 'bar'));
+        $lines[] = '';
+
+        $labels = array_values($chart['labels'] ?? []);
+        $values = array_values($chart['values'] ?? []);
+        $max = max(array_map(static fn ($value) => (float) $value, $values ?: [0])) ?: 1;
+
+        foreach ($labels as $index => $label) {
+            $value = (float) ($values[$index] ?? 0);
+            $bar = str_repeat('#', (int) round(($value / $max) * 32));
+            $lines[] = Str::limit((string) $label, 32, '') . ' | ' . $bar . ' ' . number_format($value, 2);
+        }
+
+        return $this->renderPdfLines($lines);
+    }
+
+    private function renderPdfLines(array $lines): string
+    {
+        $objects = [];
+        $content = "BT\n/F1 11 Tf\n50 790 Td\n14 TL\n";
+        foreach ($lines as $line) {
+            $content .= '(' . $this->escapePdfText((string) $line) . ") Tj\nT*\n";
+        }
+        $content .= "ET";
+
+        $objects[] = "<< /Type /Catalog /Pages 2 0 R >>";
+        $objects[] = "<< /Type /Pages /Kids [3 0 R] /Count 1 >>";
+        $objects[] = "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>";
+        $objects[] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>";
+        $objects[] = "<< /Length " . strlen($content) . " >>\nstream\n{$content}\nendstream";
+
+        $pdf = "%PDF-1.4\n";
+        $offsets = [0];
+        foreach ($objects as $index => $object) {
+            $offsets[] = strlen($pdf);
+            $pdf .= ($index + 1) . " 0 obj\n{$object}\nendobj\n";
+        }
+
+        $xref = strlen($pdf);
+        $pdf .= "xref\n0 " . (count($objects) + 1) . "\n";
+        $pdf .= "0000000000 65535 f \n";
+        for ($i = 1; $i <= count($objects); $i++) {
+            $pdf .= str_pad((string) $offsets[$i], 10, '0', STR_PAD_LEFT) . " 00000 n \n";
+        }
+        $pdf .= "trailer\n<< /Size " . (count($objects) + 1) . " /Root 1 0 R >>\n";
+        $pdf .= "startxref\n{$xref}\n%%EOF";
+
+        return $pdf;
+    }
+
+    private function escapePdfText(string $text): string
+    {
+        $text = mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8');
+
+        return str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $text);
     }
 
     private function shouldReturnFullRecordSet(string $question): bool

@@ -453,6 +453,7 @@ class AIService
             . "8. If the user asks to add columns to the current result, keep the previous query filters and add the requested columns instead of starting a new broad query.\n\n"
             . "SQL OUTPUT RULES:\n"
             . "- Return ONLY the raw SQL string. No markdown, no \"```sql\", no explanations.\n"
+            . "- If the user asks for a chart, graph, trend, comparison, breakdown, or 'wise' report, generate grouped aggregate SQL with one readable label column and one numeric value column suitable for charting.\n"
             . "- Use LIMIT 100 by default unless the user asks for full/all records, complete data, no limit, not only 100, or 'sab dikhao'. In that case, do not add LIMIT.\n"
             . "- If the query would require DROP, DELETE, UPDATE, TRUNCATE, or INSERT, return exactly: ERROR: Unauthorized Action\n\n"
             . "CONVERSATION RULE:\n"
