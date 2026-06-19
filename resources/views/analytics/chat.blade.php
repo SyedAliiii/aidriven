@@ -205,6 +205,62 @@
 [data-theme="dark"] #aq-rail .rail-logo svg {
   stroke: rgba(255, 255, 255, 0.7) !important;
 }
+ /* other css */
+/* ── Fix orbs covering search bar on focus ── */
+#aq-sidebar .sb-orb3,
+#aq-sidebar .sb-gem-bar {
+  pointer-events: none;
+  z-index: 0 !important;
+}
+
+#aq-search-wrap {
+  position: relative;
+  z-index: 2 !important;
+}
+
+#aq-search-wrap:focus-within {
+  background: rgba(0, 0, 0, 0.07) !important;
+  border-color: rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Light mode */
+#aq-sidebar .sb-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Dark mode fix */
+[data-theme="dark"] #aq-search-wrap:focus-within {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* ── Logo fix in light mode ── */
+#aq-sidebar .sb-brand .brand-name {
+  color: #111827 !important;
+}
+
+#aq-sidebar .sb-brand svg path,
+#aq-sidebar .sb-brand svg rect,
+#aq-sidebar .sb-brand svg circle,
+#aq-sidebar .sb-brand svg polygon {
+  stroke: #111827 !important;
+  fill: #111827 !important;
+}
+
+/* Dark mode — white rakho ── */
+[data-theme="dark"] #aq-sidebar .sb-brand .brand-name {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] #aq-sidebar .sb-brand svg path,
+[data-theme="dark"] #aq-sidebar .sb-brand svg rect,
+[data-theme="dark"] #aq-sidebar .sb-brand svg circle,
+[data-theme="dark"] #aq-sidebar .sb-brand svg polygon {
+  stroke: #ffffff !important;
+  fill: #ffffff !important;
+}
+
 </style>
 
 <div id="aq-shell">
@@ -333,7 +389,7 @@
       <div class="sb-top">
         <div class="sb-brand">
           <a href="{{ route('dashboard') }}" style="display:flex;align-items:center;flex-shrink:0;">
-            <x-application-logo class="block h-7 w-auto fill-current text-white" />
+             <x-application-logo class="block h-7 w-auto fill-current text-gray-900 dark:text-white" />
           </a>
           <span class="brand-name">Analytics</span>
         </div>
