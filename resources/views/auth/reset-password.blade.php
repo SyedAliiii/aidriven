@@ -1,39 +1,159 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
-        @csrf
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reset Password — {{ config('app.name') }}</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="antialiased bg-gray-50 dark:bg-gray-950 min-h-screen flex items-center justify-center px-4 py-12">
 
-        <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
+<div class="w-full max-w-[400px]">
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    {{-- Brand --}}
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center h-11 w-11 rounded-2xl mb-4">
+            <a href="{{ route('dashboard') }}" class="shrink-0 flex items-center">
+                <x-application-logo class="block h-20 w-auto fill-current text-gray-900 dark:text-white" />
+            </a>
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        {{-- Key Icon --}}
+        <div class="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800/40 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+            </svg>
         </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+        <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Set new password</h1>
+        <p class="mt-1.5 text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-[300px] mx-auto">
+            Choose a strong password for your account.
+        </p>
+    </div>
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
+    {{-- Card --}}
+    <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        <form method="POST" action="{{ route('password.store') }}" class="px-6 py-6 space-y-5">
+            @csrf
+
+            {{-- Hidden Token --}}
+            <input type="hidden" name="token" value="{{ $request->route('token') }}">
+
+            {{-- Email --}}
+            <div class="space-y-1.5">
+                <label for="email" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Email
+                </label>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    value="{{ old('email', $request->email) }}"
+                    required
+                    autofocus
+                    autocomplete="username"
+                    placeholder="you@example.com"
+                    class="block w-full h-10 rounded-lg border px-3.5 text-sm transition
+                        bg-white dark:bg-gray-800
+                        text-gray-900 dark:text-gray-100
+                        placeholder-gray-400 dark:placeholder-gray-500
+                        border-gray-200 dark:border-gray-700
+                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                        @error('email') border-red-400 dark:border-red-600 @enderror"
+                />
+                @error('email')
+                    <p class="text-xs text-red-500 dark:text-red-400 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ $message }}
+                    </p>
+                @enderror
+            </div>
+
+            {{-- New Password --}}
+            <div class="space-y-1.5">
+                <label for="password" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    New Password
+                </label>
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    required
+                    autocomplete="new-password"
+                    placeholder="••••••••"
+                    class="block w-full h-10 rounded-lg border px-3.5 text-sm transition
+                        bg-white dark:bg-gray-800
+                        text-gray-900 dark:text-gray-100
+                        placeholder-gray-400 dark:placeholder-gray-500
+                        border-gray-200 dark:border-gray-700
+                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                        @error('password') border-red-400 dark:border-red-600 @enderror"
+                />
+                @error('password')
+                    <p class="text-xs text-red-500 dark:text-red-400 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ $message }}
+                    </p>
+                @enderror
+            </div>
+
+            {{-- Confirm Password --}}
+            <div class="space-y-1.5">
+                <label for="password_confirmation" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Confirm Password
+                </label>
+                <input
+                    id="password_confirmation"
+                    type="password"
+                    name="password_confirmation"
+                    required
+                    autocomplete="new-password"
+                    placeholder="••••••••"
+                    class="block w-full h-10 rounded-lg border px-3.5 text-sm transition
+                        bg-white dark:bg-gray-800
+                        text-gray-900 dark:text-gray-100
+                        placeholder-gray-400 dark:placeholder-gray-500
+                        border-gray-200 dark:border-gray-700
+                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                        @error('password_confirmation') border-red-400 dark:border-red-600 @enderror"
+                />
+                @error('password_confirmation')
+                    <p class="text-xs text-red-500 dark:text-red-400 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ $message }}
+                    </p>
+                @enderror
+            </div>
+
+            {{-- Submit --}}
+            <button type="submit"
+                class="w-full h-10 rounded-lg bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold tracking-wide transition shadow-sm shadow-indigo-200 dark:shadow-none">
+                Reset Password
+            </button>
+        </form>
+
+        {{-- Back to login --}}
+        <div class="px-6 pb-5 border-t border-gray-100 dark:border-gray-800 pt-4 text-center">
+            <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                </svg>
+                Back to Sign in
+            </a>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    </div>
+
+</div>
+
+</body>
+</html>

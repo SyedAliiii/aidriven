@@ -1,179 +1,540 @@
 <x-app-layout>
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <div class="flex items-start justify-between gap-4">
-                <div>
-                    <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                        {{ $isSuperAdmin ? 'Super Admin Dashboard' : 'Organization Dashboard' }}
-                    </h1>
-                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                        {{ $isSuperAdmin ? 'Monitor platform usage, users, organizations, and analytics activity.' : 'Monitor your organization analytics usage and recent activity.' }}
-                    </p>
-                </div>
-                <a href="{{ route('dashboard.analytics') }}"
-                   class="inline-flex items-center px-4 py-2 rounded-md bg-gray-900 text-white dark:bg-white dark:text-gray-900 text-sm hover:opacity-90 transition">
-                    Open Analytics
-                </a>
-            </div>
+<style>
+:root{
+  --bg:#f7f8fb;
+  --surface:#ffffff;
+  --surface-2:#fbfbfd;
+  --border:#e4e7ee;
+  --border-soft:#edeff4;
+  --text:#0f1320;
+  --text-2:#5a6480;
+  --text-3:#9aa2b8;
+  --accent:#4f46e5;
+  --accent-2:#7c3aed;
+  --accent-light:#eef2ff;
+  --accent-border:#c7d2fe;
+  --green:#0d9568;
+  --green-light:#ecfdf5;
+  --green-border:#a7f3d4;
+  --cyan:#0891b2;
+  --cyan-light:#ecfeff;
+  --cyan-border:#a5f3fc;
+  --amber:#b45309;
+  --amber-light:#fffbeb;
+  --amber-border:#fde68a;
+  --dot:#0d9568;
+  --chart-line:#4f46e5;
+  --chart-fill-a:rgba(79,70,229,.16);
+  --chart-fill-b:rgba(79,70,229,.01);
+  --chart-text:#9aa2b8;
+  --chart-grid:#edeff4;
+  --mono:'SFMono-Regular',Menlo,Consolas,monospace;
+}
+.dark #dq-root{
+  --bg:#0a0d16;
+  --surface:#10131e;
+  --surface-2:#0d1019;
+  --border:#1d2336;
+  --border-soft:#171b29;
+  --text:#e7eaf3;
+  --text-2:#8893b3;
+  --text-3:#fff;
+  --accent:#818cf8;
+  --accent-2:#a78bfa;
+  --accent-light:#191c3a;
+  --accent-border:#312e6e;
+  --green:#34d399;
+  --green-light:#06231a;
+  --green-border:#0d4a35;
+  --cyan:#22d3ee;
+  --cyan-light:#062229;
+  --cyan-border:#0c4a58;
+  --amber:#fbbf24;
+  --amber-light:#241a04;
+  --amber-border:#4a3308;
+  --dot:#34d399;
+  --chart-line:#818cf8;
+  --chart-fill-a:rgba(129,140,248,.18);
+  --chart-fill-b:rgba(129,140,248,.01);
+  --chart-text:#5d6690;
+  --chart-grid:#1a2035;
+}
 
-            @if(!$isSuperAdmin && $organization)
-                <div class="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-900 px-3 py-1 text-xs text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-800">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span>
-                    {{ $organization->name }}
-                </div>
-            @endif
+*{box-sizing:border-box;margin:0;padding:0;}
+#dq-root{
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
+  min-height:calc(100vh - 4rem);
+  padding:30px 0 56px;
+  transition:background .2s,color .2s;
+}
+.dq-w{max-width:1180px;margin:0 auto;padding:0 28px;}
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                @if($isSuperAdmin)
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Total Users</div>
-                        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $kpis['total_users'] }}</div>
-                    </div>
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Organizations</div>
-                        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $kpis['total_organizations'] }}</div>
-                    </div>
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Active Organizations</div>
-                        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $kpis['active_organizations'] }}</div>
-                    </div>
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Total Queries</div>
-                        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $kpis['total_queries'] }}</div>
-                    </div>
-                @else
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-                        <div class="text-xs text-gray-500 dark:text-gray-400">My Queries</div>
-                        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $kpis['my_queries'] }}</div>
-                    </div>
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Org Queries</div>
-                        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $kpis['org_queries'] }}</div>
-                    </div>
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Average Result Rows</div>
-                        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $kpis['avg_rows'] }}</div>
-                    </div>
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Organization Users</div>
-                        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $kpis['org_users'] }}</div>
-                    </div>
-                @endif
-            </div>
+@keyframes dq-rise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+@keyframes dq-bline{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+@keyframes dq-blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+@keyframes dq-count-pop{0%{opacity:0;transform:translateY(3px);}100%{opacity:1;transform:translateY(0);}}
 
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                <div class="xl:col-span-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-                    <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        Queries Trend (Last 14 Days)
-                    </h2>
-                    <div class="mt-3 h-72">
-                        <canvas id="trendChart"></canvas>
-                    </div>
-                </div>
+/* ── Page header ── */
+.dq-hdr{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:16px;margin-bottom:18px;
+  animation:dq-rise .35s ease both;
+}
+.dq-hdr-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.dq-hdr-left h1{
+  font-size:21px;font-weight:700;color:var(--text);
+  letter-spacing:-.03em;
+}
+.dq-hdr-sep{width:1px;height:20px;background:var(--border);}
+.dq-hdr-left p{font-size:13px;color:var(--text-2);}
 
-                <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-                    <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        {{ $isSuperAdmin ? 'Queries by Organization' : 'Queries by User (Org)' }}
-                    </h2>
-                    <div class="mt-3 h-72">
-                        <canvas id="breakdownChart"></canvas>
-                    </div>
-                </div>
-            </div>
+.dq-analytics-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 17px;border-radius:9px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#fff;font-size:13px;font-weight:600;
+  text-decoration:none;white-space:nowrap;
+  transition:transform .14s,box-shadow .14s;flex-shrink:0;
+  letter-spacing:-.01em;
+  box-shadow:0 4px 14px rgba(79,70,229,.28);
+}
+.dq-analytics-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(79,70,229,.38);}
+.dq-analytics-btn:active{transform:translateY(0);}
+.dq-analytics-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;}
 
-            <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
-                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-800">
-                    <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        Recent Query Activity
-                    </h2>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800 text-sm">
-                        <thead class="bg-gray-50 dark:bg-gray-900">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Question</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">User</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Organization</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Rows</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Time</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
-                            @forelse($recentQueries as $item)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/40">
-                                    <td class="px-4 py-3 text-gray-900 dark:text-gray-100">{{ \Illuminate\Support\Str::limit($item->question, 90) }}</td>
-                                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $item->user?->name ?? 'N/A' }}</td>
-                                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $item->organization?->name ?? 'N/A' }}</td>
-                                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $item->row_count }}</td>
-                                    <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ optional($item->created_at)->diffForHumans() }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
-                                        No activity yet.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+/* ── Org badge ── */
+.dq-org{
+  display:inline-flex;align-items:center;gap:7px;
+  margin-bottom:22px;
+  padding:5px 13px;border-radius:20px;
+  background:var(--surface);border:1px solid var(--border);
+  font-size:12px;font-weight:500;color:var(--text-2);
+  animation:dq-rise .35s .03s ease both;
+}
+.dq-org-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--dot);
+  animation:dq-blink 2.2s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════
+   STAT STRIP — signature element (v1 layout, animated)
+══════════════════════════════════════════ */
+.dq-stats{
+  display:flex;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  margin-bottom:22px;
+  overflow:hidden;
+  animation:dq-rise .35s .06s ease both;
+}
+.dq-stat{
+  flex:1;min-width:0;
+  padding:18px 22px 16px;
+  position:relative;
+  cursor:default;
+  transition:background .18s;
+}
+.dq-stat:hover{background:var(--surface-2);}
+.dq-stat + .dq-stat{border-left:1px solid var(--border-soft);}
+.dq-stat::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--stat-c);
+  transform-origin:left;
+  animation:dq-bline .6s cubic-bezier(.4,0,.2,1) both;
+  animation-delay:calc(.15s + var(--stat-i, 0) * .08s);
+}
+.dq-stat-top{display:flex;align-items:center;gap:7px;margin-bottom:10px;}
+.dq-stat-icon{
+  width:15px;height:15px;flex-shrink:0;color:var(--stat-c);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.dq-stat:hover .dq-stat-icon{transform:scale(1.18) rotate(-4deg);}
+.dq-stat-icon svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:2.1;}
+.dq-stat-label{
+  font-size:10.5px;font-weight:700;color:var(--text-3);
+  text-transform:uppercase;letter-spacing:.09em;
+}
+.dq-stat-value{
+  font-family:var(--mono);
+  font-size:27px;font-weight:600;color:var(--text);
+  letter-spacing:-.02em;line-height:1;
+  animation:dq-count-pop .3s ease both;
+  animation-delay:calc(.55s + var(--stat-i, 0) * .08s);
+}
+@media(max-width:920px){
+  .dq-stats{flex-wrap:wrap;}
+  .dq-stat{flex:1 1 50%;}
+  .dq-stat:nth-child(2){border-left:1px solid var(--border-soft);}
+  .dq-stat:nth-child(3){border-left:none;border-top:1px solid var(--border-soft);}
+  .dq-stat:nth-child(4){border-top:1px solid var(--border-soft);}
+}
+@media(max-width:480px){
+  .dq-stat{flex:1 1 100%;border-left:none!important;}
+  .dq-stat:not(:first-child){border-top:1px solid var(--border-soft);}
+}
+
+/* ── Charts row ── */
+.dq-charts{
+  display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);
+  gap:14px;margin-bottom:14px;
+}
+@media(max-width:860px){.dq-charts{grid-template-columns:1fr;}}
+
+.dq-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px 22px;
+  transition:background .2s,border-color .2s;
+  animation:dq-rise .35s .1s ease both;
+}
+.dq-card-hdr{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:16px;
+}
+.dq-card-title{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.01em;}
+.dq-card-sub{font-size:11.5px;color:var(--text-3);font-family:var(--mono);}
+.dq-chart-box{position:relative;height:248px;}
+
+/* ── Table ── */
+.dq-tcard{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  transition:background .2s,border-color .2s;
+  animation:dq-rise .35s .14s ease both;
+}
+.dq-thead-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 22px;
+  border-bottom:1px solid var(--border);
+}
+.dq-thead-row h2{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.01em;}
+.dq-pill{
+  font-size:11px;padding:3px 10px;border-radius:20px;
+  background:var(--bg);color:var(--text-3);
+  border:1px solid var(--border);font-weight:500;font-family:var(--mono);
+}
+.dq-tscroll{overflow-x:auto;}
+table.dq-t{width:100%;border-collapse:collapse;font-size:13px;}
+table.dq-t thead th{
+  padding:10px 18px;text-align:left;
+  font-size:10.5px;font-weight:700;color:var(--text-3);
+  text-transform:uppercase;letter-spacing:.08em;
+  background:var(--surface-2);
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+table.dq-t tbody td{
+  padding:12px 18px;
+  color:var(--text-2);
+  border-bottom:1px solid var(--border-soft);
+  vertical-align:middle;
+}
+table.dq-t tbody tr:last-child td{border-bottom:none;}
+table.dq-t tbody tr{transition:background .12s;}
+table.dq-t tbody tr:hover td{background:var(--surface-2);}
+.dq-q-text{color:var(--text);font-weight:500;}
+.dq-badge{
+  display:inline-block;
+  padding:2px 8px;border-radius:5px;
+  font-size:11.5px;font-weight:600;font-family:var(--mono);
+  background:var(--accent-light);color:var(--accent);
+  border:1px solid var(--accent-border);
+}
+.dq-t-time{font-size:11.5px;color:var(--text-3);font-family:var(--mono);}
+.dq-empty{padding:40px;text-align:center;font-size:13px;color:var(--text-3);}
+
+/* section label */
+.dq-section-label{
+  display:flex;align-items:center;gap:9px;
+  font-size:11px;font-weight:700;color:var(--text-3);
+  text-transform:uppercase;letter-spacing:.1em;
+  margin-bottom:11px;margin-top:6px;
+}
+.dq-section-label::after{
+  content:'';flex:1;height:1px;background:var(--border-soft);
+}
+
+@media(prefers-reduced-motion:reduce){
+  .dq-hdr,.dq-org,.dq-stats,.dq-card,.dq-tcard,.dq-stat::before,.dq-stat-value{animation:none!important;}
+}
+</style>
+
+@php
+  $isSuperAdmin = isset($isSuperAdmin) ? $isSuperAdmin : false;
+  $organization = isset($organization) ? $organization : null;
+@endphp
+
+<div id="dq-root">
+<div class="dq-w">
+
+  {{-- Header --}}
+  <div class="dq-hdr">
+    <div class="dq-hdr-left">
+      <h1>{{ $isSuperAdmin ? 'Super Admin Dashboard' : 'Dashboard' }}</h1>
+      <div class="dq-hdr-sep"></div>
+      <p>{{ $isSuperAdmin ? 'Platform-wide usage, users, organizations, and query activity.' : 'Your organization analytics usage and recent query activity.' }}</p>
     </div>
+    <a href="{{ route('dashboard.analytics') }}" class="dq-analytics-btn">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Open Analytics
+    </a>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        (function () {
-            const isDark = document.documentElement.classList.contains('dark');
-            const gridColor = isDark ? 'rgba(75, 85, 99, 0.35)' : 'rgba(209, 213, 219, 0.8)';
-            const textColor = isDark ? '#d1d5db' : '#4b5563';
+  {{-- Org badge --}}
+  @if(!$isSuperAdmin && $organization)
+    <div class="dq-org">
+      <span class="dq-org-dot"></span>
+      {{ $organization->name }}
+    </div>
+  @else
+    <div style="margin-bottom:22px;"></div>
+  @endif
 
-            const trend = @json($trendChart);
-            const breakdown = @json($breakdownChart);
+  {{-- Stat strip --}}
+  <div class="dq-stats">
+    @if($isSuperAdmin)
+      <div class="dq-stat" style="--stat-c:var(--accent);--stat-i:0;">
+        <div class="dq-stat-top">
+          <span class="dq-stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>
+          <span class="dq-stat-label">Total Users</span>
+        </div>
+        <div class="dq-stat-value" data-count="{{ $kpis['total_users'] }}">0</div>
+      </div>
+      <div class="dq-stat" style="--stat-c:var(--green);--stat-i:1;">
+        <div class="dq-stat-top">
+          <span class="dq-stat-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+          <span class="dq-stat-label">Organizations</span>
+        </div>
+        <div class="dq-stat-value" data-count="{{ $kpis['total_organizations'] }}">0</div>
+      </div>
+      <div class="dq-stat" style="--stat-c:var(--accent-2);--stat-i:2;">
+        <div class="dq-stat-top">
+          <span class="dq-stat-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+          <span class="dq-stat-label">Active Orgs</span>
+        </div>
+        <div class="dq-stat-value" data-count="{{ $kpis['active_organizations'] }}">0</div>
+      </div>
+      <div class="dq-stat" style="--stat-c:var(--amber);--stat-i:3;">
+        <div class="dq-stat-top">
+          <span class="dq-stat-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span>
+          <span class="dq-stat-label">Total Queries</span>
+        </div>
+        <div class="dq-stat-value" data-count="{{ $kpis['total_queries'] }}">0</div>
+      </div>
+    @else
+      <div class="dq-stat" style="--stat-c:var(--accent);--stat-i:0;">
+        <div class="dq-stat-top">
+          <span class="dq-stat-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span>
+          <span class="dq-stat-label">My Queries</span>
+        </div>
+        <div class="dq-stat-value" data-count="{{ $kpis['my_queries'] }}">0</div>
+      </div>
+      <div class="dq-stat" style="--stat-c:var(--green);--stat-i:1;">
+        <div class="dq-stat-top">
+          <span class="dq-stat-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+          <span class="dq-stat-label">Org Queries</span>
+        </div>
+        <div class="dq-stat-value" data-count="{{ $kpis['org_queries'] }}">0</div>
+      </div>
+      <div class="dq-stat" style="--stat-c:var(--accent-2);--stat-i:2;">
+        <div class="dq-stat-top">
+          <span class="dq-stat-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+          <span class="dq-stat-label">Avg Result Rows</span>
+        </div>
+        <div class="dq-stat-value" data-count="{{ $kpis['avg_rows'] }}">0</div>
+      </div>
+      <div class="dq-stat" style="--stat-c:var(--amber);--stat-i:3;">
+        <div class="dq-stat-top">
+          <span class="dq-stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>
+          <span class="dq-stat-label">Org Users</span>
+        </div>
+        <div class="dq-stat-value" data-count="{{ $kpis['org_users'] }}">0</div>
+      </div>
+    @endif
+  </div>
 
-            const trendCtx = document.getElementById('trendChart');
-            if (trendCtx) {
-                new Chart(trendCtx, {
-                    type: 'line',
-                    data: {
-                        labels: trend.labels || [],
-                        datasets: [{
-                            label: 'Queries',
-                            data: trend.values || [],
-                            borderColor: '#111827',
-                            backgroundColor: 'rgba(17, 24, 39, 0.15)',
-                            fill: true,
-                            tension: 0.35
-                        }]
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        plugins: { legend: { labels: { color: textColor } } },
-                        scales: {
-                            x: { ticks: { color: textColor }, grid: { color: gridColor } },
-                            y: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true }
-                        }
-                    }
-                });
+  {{-- Charts --}}
+  <div class="dq-section-label">Analytics</div>
+  <div class="dq-charts">
+    <div class="dq-card">
+      <div class="dq-card-hdr">
+        <span class="dq-card-title">Query trend</span>
+        <span class="dq-card-sub">14d</span>
+      </div>
+      <div class="dq-chart-box"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="dq-card">
+      <div class="dq-card-hdr">
+        <span class="dq-card-title">{{ $isSuperAdmin ? 'By organization' : 'By user' }}</span>
+        <span class="dq-card-sub">share</span>
+      </div>
+      <div class="dq-chart-box"><canvas id="breakdownChart"></canvas></div>
+    </div>
+  </div>
+
+  {{-- Table --}}
+  <div class="dq-section-label">Recent activity</div>
+  <div class="dq-tcard">
+    <div class="dq-thead-row">
+      <h2>Query log</h2>
+      <span class="dq-pill">{{ count($recentQueries) }} entries</span>
+    </div>
+    <div class="dq-tscroll">
+      <table class="dq-t">
+        <thead>
+          <tr>
+            <th style="width:40%">Question</th>
+            <th>User</th>
+            <th>Organization</th>
+            <th>Rows</th>
+            <th>When</th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse($recentQueries as $item)
+            <tr>
+              <td><span class="dq-q-text">{{ \Illuminate\Support\Str::limit($item->question, 80) }}</span></td>
+              <td>{{ $item->user?->name ?? '—' }}</td>
+              <td>{{ $item->organization?->name ?? '—' }}</td>
+              <td><span class="dq-badge">{{ $item->row_count }}</span></td>
+              <td><span class="dq-t-time">{{ optional($item->created_at)->diffForHumans() }}</span></td>
+            </tr>
+          @empty
+            <tr><td colspan="5" class="dq-empty">No activity yet.</td></tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function(){
+  const root = document.getElementById('dq-root');
+  const trend = @json($trendChart);
+  const breakdown = @json($breakdownChart);
+  const slices = ['#4f46e5','#7c3aed','#0d9568','#b45309','#0891b2','#db2777','#818cf8','#9aa2b8'];
+  let tC, bC;
+
+  function gc(){
+    const s = getComputedStyle(root);
+    return {
+      line: s.getPropertyValue('--chart-line').trim(),
+      fillA: s.getPropertyValue('--chart-fill-a').trim(),
+      fillB: s.getPropertyValue('--chart-fill-b').trim(),
+      text: s.getPropertyValue('--chart-text').trim(),
+      grid: s.getPropertyValue('--chart-grid').trim(),
+      surface: s.getPropertyValue('--surface').trim(),
+    };
+  }
+
+  function build(){
+    const c = gc();
+    if(tC) tC.destroy();
+    if(bC) bC.destroy();
+
+    const tEl = document.getElementById('trendChart');
+    if(tEl){
+      const ctx = tEl.getContext('2d');
+      const grad = ctx.createLinearGradient(0,0,0,248);
+      grad.addColorStop(0, c.fillA);
+      grad.addColorStop(1, c.fillB);
+      tC = new Chart(tEl,{
+        type:'line',
+        data:{
+          labels: trend.labels||[],
+          datasets:[{
+            label:'Queries',
+            data: trend.values||[],
+            borderColor:c.line,
+            backgroundColor:grad,
+            borderWidth:2.25,
+            fill:true,tension:.35,
+            pointRadius:0,pointHoverRadius:5,
+            pointBackgroundColor:c.line,
+            pointBorderColor:c.surface,pointBorderWidth:2,
+            pointHitRadius:14,
+          }]
+        },
+        options:{
+          maintainAspectRatio:false,
+          interaction:{mode:'index',intersect:false},
+          animation:{duration:700,easing:'easeOutCubic'},
+          plugins:{
+            legend:{display:false},
+            tooltip:{
+              backgroundColor:c.surface,
+              titleColor:c.text,
+              bodyColor:c.text,
+              borderColor:c.grid,
+              borderWidth:1,
+              padding:10,
+              displayColors:false,
+              callbacks:{label:ctx=>' '+ctx.parsed.y+' queries'}
             }
+          },
+          scales:{
+            x:{ticks:{color:c.text,font:{size:10.5}},grid:{display:false}},
+            y:{ticks:{color:c.text,font:{size:10.5}},grid:{color:c.grid},beginAtZero:true}
+          }
+        }
+      });
+    }
 
-            const breakdownCtx = document.getElementById('breakdownChart');
-            if (breakdownCtx) {
-                new Chart(breakdownCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: breakdown.labels || [],
-                        datasets: [{
-                            data: breakdown.values || [],
-                            backgroundColor: ['#111827', '#374151', '#4b5563', '#6b7280', '#9ca3af', '#d1d5db', '#3b82f6', '#10b981'],
-                        }]
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        plugins: { legend: { labels: { color: textColor }, position: 'bottom' } }
-                    }
-                });
-            }
-        })();
-    </script>
+    const bEl = document.getElementById('breakdownChart');
+    if(bEl) bC = new Chart(bEl,{
+      type:'doughnut',
+      data:{
+        labels:breakdown.labels||[],
+        datasets:[{data:breakdown.values||[],backgroundColor:slices,borderWidth:2,borderColor:c.surface,hoverOffset:6}]
+      },
+      options:{
+        maintainAspectRatio:false,cutout:'68%',
+        animation:{duration:700,easing:'easeOutCubic'},
+        plugins:{legend:{labels:{color:c.text,font:{size:11},boxWidth:9,padding:9},position:'bottom'}}
+      }
+    });
+  }
+
+  build();
+
+  /* count-up animation for stat values */
+  function animateCounts(){
+    document.querySelectorAll('.dq-stat-value[data-count]').forEach(el=>{
+      const target = parseFloat(el.dataset.count) || 0;
+      const isInt = Number.isInteger(target);
+      const dur = 700, start = performance.now();
+      function step(now){
+        const p = Math.min(1,(now-start)/dur);
+        const eased = 1-Math.pow(1-p,3);
+        const val = target*eased;
+        el.textContent = isInt ? Math.round(val).toLocaleString() : val.toFixed(1);
+        if(p<1) requestAnimationFrame(step);
+        else el.textContent = isInt ? target.toLocaleString() : target.toFixed(1);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+  animateCounts();
+
+  /* sync with navbar Toggle Theme */
+  new MutationObserver(()=>{
+    const dark = document.documentElement.classList.contains('dark');
+    root.setAttribute('data-theme', dark ? 'dark' : '');
+    build();
+  }).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+
+  if(document.documentElement.classList.contains('dark'))
+    root.setAttribute('data-theme','dark');
+})();
+</script>
 </x-app-layout>

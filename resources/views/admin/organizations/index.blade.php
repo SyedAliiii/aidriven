@@ -1,96 +1,186 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between gap-4">
-                <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                    Organizations
-                </h1>
+
+            {{-- Page header --}}
+            <div class="flex items-start justify-between gap-4 flex-wrap">
+                <div class="flex items-start gap-3">
+                    <div class="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 17.25v-.228a4.5 4.5 0 0 0-.12-1.03l-2.268-9.64a3.375 3.375 0 0 0-3.285-2.602H7.923a3.375 3.375 0 0 0-3.285 2.602l-2.268 9.64a4.5 4.5 0 0 0-.12 1.03v.228m19.5 0a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3m19.5 0v.75A2.25 2.25 0 0 1 19.5 21h-15a2.25 2.25 0 0 1-2.25-2.25v-.75m19.5 0h-19.5" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">Admin</p>
+                        <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Organizations</h1>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Manage the organizations connected to DataQuery AI and their database credentials.
+                        </p>
+                    </div>
+                </div>
 
                 <a href="{{ route('admin.organizations.create') }}"
-                    class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-gray-900 text-white dark:bg-white dark:text-gray-900 hover:opacity-90 transition">
-                    Add Organization
+                    class="inline-flex items-center gap-1.5 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition shrink-0">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Add organization
                 </a>
             </div>
 
+            {{-- Flash messages --}}
             @if (session('success'))
-                <div class="mt-4 rounded-md bg-green-50 border border-green-200 text-green-800 px-4 py-3 text-sm dark:bg-green-900/30 dark:border-green-900/60 dark:text-green-200">
-                    {{ session('success') }}
+                <div class="mt-6 flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-900/60 dark:bg-green-900/30 dark:text-green-200">
+                    <svg class="h-4 w-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <span>{{ session('success') }}</span>
                 </div>
             @endif
 
             @if (session('error'))
-                <div class="mt-4 rounded-md bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-sm dark:bg-red-900/30 dark:border-red-900/60 dark:text-red-200">
-                    {{ session('error') }}
+                <div class="mt-6 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-900/30 dark:text-red-200">
+                    <svg class="h-4 w-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                    </svg>
+                    <span>{{ session('error') }}</span>
                 </div>
             @endif
 
-            <div class="mt-6 overflow-x-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-                    <thead class="bg-gray-50 dark:bg-gray-800">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">DB</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">Port</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
-                        @foreach($organizations as $org)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $org->name }}</td>
-                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                                    {{ $org->db_host }}<br />
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ $org->db_database }}</span>
-                                </td>
-                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $org->db_port }}</td>
-                                <td class="px-4 py-3 text-sm">
-                                    @if($org->status === 'active')
-                                        <span class="inline-flex px-2 py-1 rounded text-xs bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-900/60">
-                                            Active
-                                        </span>
-                                    @else
-                                        <span class="inline-flex px-2 py-1 rounded text-xs bg-gray-100 text-gray-700 border border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700">
-                                            Inactive
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-3 text-right">
-                                    <div class="inline-flex items-center gap-2">
-                                        <a href="{{ route('admin.organizations.edit', $org) }}"
-                                            class="px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                                            Edit
-                                        </a>
+            {{-- Search + status filter --}}
+            <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <form method="GET" class="relative w-full sm:max-w-xs">
+                    <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search organizations..."
+                        class="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100" />
+                </form>
 
-                                        <form method="POST" action="{{ route('admin.organizations.test-connection', $org) }}">
-                                            @csrf
-                                            <button type="submit"
-                                                class="px-3 py-1.5 rounded-md bg-indigo-600 text-white text-sm hover:opacity-90 transition">
-                                                Test Connection
-                                            </button>
-                                        </form>
+                <div class="flex items-center gap-2">
+                    @php($currentStatus = request('status', 'all'))
+                    @foreach(['all' => 'All', 'active' => 'Active', 'inactive' => 'Inactive'] as $value => $label)
+                        <a href="{{ request()->fullUrlWithQuery(['status' => $value === 'all' ? null : $value]) }}"
+                            class="rounded-full px-3 py-1 text-xs font-medium transition
+                                {{ $currentStatus === $value
+                                    ? 'bg-indigo-600 text-white'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700' }}">
+                            {{ $label }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
 
-                                        <form method="POST" action="{{ route('admin.organizations.destroy', $org) }}"
-                                            onsubmit="return confirm('Delete this organization?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="px-3 py-1.5 rounded-md bg-red-600 text-white text-sm hover:opacity-90 transition">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
+            {{-- Table / empty state --}}
+            <div class="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+                @if($organizations->isEmpty())
+                    <div class="flex flex-col items-center justify-center px-6 py-16 text-center">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-white">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 17.25v-.228a4.5 4.5 0 0 0-.12-1.03l-2.268-9.64a3.375 3.375 0 0 0-3.285-2.602H7.923a3.375 3.375 0 0 0-3.285 2.602l-2.268 9.64a4.5 4.5 0 0 0-.12 1.03v.228m19.5 0a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3m19.5 0v.75A2.25 2.25 0 0 1 19.5 21h-15a2.25 2.25 0 0 1-2.25-2.25v-.75m19.5 0h-19.5" />
+                            </svg>
+                        </div>
+                        <h3 class="mt-4 text-base font-semibold text-gray-900 dark:text-gray-100">No organizations yet</h3>
+                        <p class="mt-1 max-w-sm text-sm text-gray-500 dark:text-gray-400">
+                            Add an organization to connect its database and start querying it with AI.
+                        </p>
+                        <a href="{{ route('admin.organizations.create') }}"
+                            class="mt-5 inline-flex items-center gap-1.5 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Add organization
+                        </a>
+                    </div>
+                @else
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                        <thead class="bg-gray-50 dark:bg-gray-800/60">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Organization</th>
+                                <th class="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Database connection</th>
+                                <th class="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Status</th>
+                                <th class="px-4 py-3 text-right text-[11px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Actions</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+                            @foreach($organizations as $org)
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40">
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-xs font-semibold text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
+                                                {{ strtoupper(substr($org->name, 0, 2)) }}
+                                            </div>
+                                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $org->name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="text-sm text-gray-900 dark:text-gray-100">{{ $org->db_database }}</div>
+                                        <div class="font-mono text-xs text-gray-500 dark:text-gray-400">{{ $org->db_host }}:{{ $org->db_port }}</div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        @if($org->status === 'active')
+                                            <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-200">
+                                                <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                                                Active
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                                <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
+                                                Inactive
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3 text-right">
+                                        <div class="inline-flex items-center gap-1">
+                                            <a href="{{ route('admin.organizations.edit', $org) }}" title="Edit"
+                                                class="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100 transition">
+                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+                                                </svg>
+                                            </a>
+
+                                            <form method="POST" action="{{ route('admin.organizations.test-connection', $org) }}">
+                                                @csrf
+                                                <button type="submit" title="Test connection"
+                                                    class="rounded-md p-2 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 transition">
+                                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5 14.25 2.25 12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+
+                                            <form method="POST" action="{{ route('admin.organizations.destroy', $org) }}"
+                                                onsubmit="return confirm('Delete this organization?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" title="Delete"
+                                                    class="rounded-md p-2 text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition">
+                                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
             </div>
 
-            <div class="mt-4">
-                {{ $organizations->links() }}
-            </div>
+            {{-- Pagination --}}
+            @if(!$organizations->isEmpty() && method_exists($organizations, 'total'))
+                <div class="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                    <span>Showing {{ $organizations->firstItem() }}–{{ $organizations->lastItem() }} of {{ $organizations->total() }}</span>
+                    <div>{{ $organizations->links() }}</div>
+                </div>
+            @else
+                <div class="mt-4">
+                    {{ $organizations->links() }}
+                </div>
+            @endif
+
         </div>
     </div>
 </x-app-layout>
-
