@@ -52,8 +52,8 @@
 @endphp
 
 <nav id="aq-navbar" x-data="{ open: false }" class="sticky top-0 z-30 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 backdrop-blur-md">
-    <div class=" mx-auto px-4 sm:px-6 lg:px-4">
-        <div class="relative flex items-center h-14">
+    <div class="px-4">
+        <div class="relative flex items-center justify-center h-14">
 
             {{-- Logo --}}
             <a href="{{ route('dashboard') }}" class="flex items-center shrink-0 mr-3">
