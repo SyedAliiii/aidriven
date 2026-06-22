@@ -51,9 +51,7 @@
   $navInitials = collect(explode(' ', $navUserName))->map(fn($w) => strtoupper(substr($w,0,1)))->take(2)->join('');
 @endphp
 
-<nav id="aq-navbar" x-data="{ open: false }"
-  class="sticky top-0 z-30 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 backdrop-blur-md">
-
+<nav id="aq-navbar" x-data="{ open: false }" class="sticky top-0 z-30 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 backdrop-blur-md">
     <div class=" mx-auto px-4 sm:px-6 lg:px-4">
         <div class="relative flex items-center h-14">
 
