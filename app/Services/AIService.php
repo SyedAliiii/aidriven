@@ -431,6 +431,130 @@ class AIService
     }
 
     /**
+     * Generates a human-readable Markdown summary of the database query results.
+     */
+    public function generateDataSummary(string $userPrompt, array $rows): string
+    {
+        if (empty($rows)) {
+            return 'No matching records were found.';
+        }
+
+        $settings = AISettings::current();
+
+        // Limit the rows passed to the model to avoid hitting token limits.
+        $limitedRows = array_slice($rows, 0, 30);
+        $dataStr = json_encode($limitedRows, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+        $systemInstruction = "You are a professional business intelligence assistant.\n"
+            . "Your job is to write a clear, concise, and structured summary/explanation of the query results in response to the user's question.\n"
+            . "Present key insights and metrics using headings (e.g. ### Total Sales), bold text, and list items or bullet points. Do NOT repeat or output any SQL query.\n"
+            . "Make it sound natural and professional in Roman Urdu, English, or Hindi depending on the language of the user's prompt.\n"
+            . "Keep the summary brief and focus on the main findings.";
+
+        $userMessage = "User question: {$userPrompt}\n\n"
+            . "Database Query Results:\n"
+            . "{$dataStr}\n\n"
+            . "Please write a summary/explanation of this data using Markdown formatting (headings, lists, bold text, etc.).";
+
+        try {
+            return match ($settings->provider) {
+                'openai' => $this->summarizeWithOpenAI($systemInstruction, $userMessage, $settings),
+                default => $this->summarizeWithGemini($systemInstruction, $userMessage, $settings),
+            };
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AI summary generation failed', [
+                'error' => $e->getMessage()
+            ]);
+            // Fallback summary
+            $rowCount = count($rows);
+            return "I found {$rowCount} matching result(s) for your question. The results are shown in the table below.";
+        }
+    }
+
+    private function summarizeWithGemini(string $systemInstruction, string $userMessage, AISettings $settings): string
+    {
+        $apiKey = config('gemini.api_key');
+        if (blank($apiKey)) {
+            throw new \RuntimeException('GEMINI_API_KEY is not configured.');
+        }
+
+        $model = $settings->gemini_model ?: config('gemini.model', 'gemini-2.5-flash');
+        $timeout = (int) config('gemini.timeout', 60);
+        $verifySsl = (bool) config('gemini.verify_ssl', true);
+        $caBundle = config('gemini.ca_bundle');
+
+        $httpOptions = ['timeout' => $timeout];
+        if ($caBundle) {
+            $httpOptions['verify'] = $caBundle;
+        } else {
+            $httpOptions['verify'] = $verifySsl;
+        }
+
+        $client = Gemini::factory()
+            ->withApiKey($apiKey)
+            ->withHttpClient(new GuzzleClient($httpOptions))
+            ->make();
+
+        try {
+            $response = $client
+                ->generativeModel(model: $model)
+                ->withSystemInstruction(Content::parse($systemInstruction))
+                ->generateContent($userMessage);
+        } catch (\Throwable $e) {
+            $response = $client
+                ->generativeModel(model: $model)
+                ->generateContent($systemInstruction . "\n\n" . $userMessage);
+        }
+
+        return trim($response->text());
+    }
+
+    private function summarizeWithOpenAI(string $systemInstruction, string $userMessage, AISettings $settings): string
+    {
+        $apiKey = config('openai.api_key');
+        if (blank($apiKey)) {
+            throw new \RuntimeException('OPENAI_API_KEY is not configured.');
+        }
+
+        $baseUrl = rtrim(config('openai.base_url', 'https://api.openai.com/v1'), '/');
+        $model = $settings->openai_model ?: config('openai.model', 'gpt-4.1-mini');
+        $timeout = (int) config('openai.timeout', 60);
+        $verifySsl = (bool) config('openai.verify_ssl', true);
+        $caBundle = config('openai.ca_bundle');
+
+        $httpOptions = [
+            'base_uri' => $baseUrl . '/',
+            'timeout' => $timeout,
+        ];
+        if ($caBundle) {
+            $httpOptions['verify'] = $caBundle;
+        } else {
+            $httpOptions['verify'] = $verifySsl;
+        }
+
+        $client = new GuzzleClient($httpOptions);
+
+        $response = $client->post('chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => $model,
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemInstruction],
+                    ['role' => 'user', 'content' => $userMessage],
+                ],
+                'temperature' => 0.3,
+            ],
+        ]);
+
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+
+        return trim($data['choices'][0]['message']['content'] ?? '');
+    }
+
+    /**
      * Shared, hardened system instruction for all AI providers.
      */
     private function buildSystemInstruction(string $guideContext): string

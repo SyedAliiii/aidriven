@@ -14,255 +14,6 @@
   $exportUrl        = route('dashboard.analytics.export');
   $pdfUrl           = route('dashboard.analytics.pdf');
 @endphp
-
-<style>
-  @keyframes pulse-dots {
-    0%,100%{opacity:.3;transform:scale(.8);}
-    50%{opacity:1;transform:scale(1.2);}
-  }
-  .tdot{animation:pulse-dots 1.4s infinite both;}
-  .tdot:nth-child(2){animation-delay:.2s;}
-  .tdot:nth-child(3){animation-delay:.4s;}
-  /* Data table inside bubble */
-  .ai-data-table{border-collapse:collapse;width:max-content;min-width:100%;font-size:.72rem;}
-  .ai-data-table th{background:rgba(0,0,0,.08);padding:6px 10px;text-align:left;white-space:nowrap;font-weight:600;}
-  .ai-data-table td{padding:5px 10px;border-top:1px solid rgba(0,0,0,.06);white-space:nowrap;}
-  .ai-table-wrap{overflow-x:auto;max-width:100%;border-radius:6px;margin-top:6px;border:1px solid rgba(0,0,0,.06);}
-  .ai-table-meta{margin-top:8px;font-size:.7rem;color:#6b7280;}
-  .ai-chart-wrap{width:min(720px,100%);height:340px;margin-top:10px;padding:12px;border:1px solid rgba(0,0,0,.06);border-radius:6px;background:rgba(255,255,255,.55);}
-  /* Bubble styles for AI rich messages */
-  .aq-ai-bubble{max-width:100%;word-break:break-word;}
-  .aq-export-btn{margin-top:10px;display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:7px;font-size:.75rem;font-weight:600;cursor:pointer;border:none;background:#111827;color:#fff;transition:opacity .14s;}
-  .aq-export-btn:hover{opacity:.85;}
-  .aq-export-btn+.aq-export-btn{margin-left:6px;}
-  #aq-hbtn,#aq-topbar .topbar-sep:first-of-type{display:none !important;}
-
-  
-  /* ── Remove ALL blue focus rings / outlines ── */
-  *:focus { outline: none !important; box-shadow: none !important; }
-  input:focus, textarea:focus, select:focus, button:focus {
-    outline: none !important;
-    box-shadow: none !important;
-  }
-  #aq-search:focus { outline: none !important; box-shadow: none !important; }
-  #aq-q:focus      { outline: none !important; box-shadow: none !important; }
-  #aq-search-wrap:focus-within {
-    border-color: rgba(255,255,255,.15) !important;
-    background: rgba(255,255,255,.07) !important;
-    box-shadow: none !important;
-  }
-  #aq-box:focus-within        { outline: none !important; box-shadow: none !important; }
-  #aq-box textarea:focus      { outline: none !important; box-shadow: none !important; }
-
-
-/* ── Sidebar LIGHT in light mode (default) ── */
-#aq-sidebar {
-  background: #ffffff !important;
-  border-right-color: rgba(0, 0, 0, 0.1) !important;
-}
-
-#aq-sidebar .brand-name,
-#aq-sidebar .sb-section {
-  color: #111827 !important;
-}
-
-#aq-sidebar .hbtn-sb {
-  color: #374151 !important;
-  background: transparent !important;
-}
-#aq-sidebar .hbtn-sb:hover {
-  background: rgba(0, 0, 0, 0.06) !important;
-  color: #111827 !important;
-}
-#aq-sidebar .hbtn-sb.active {
-  background: rgba(0, 0, 0, 0.09) !important;
-  color: #111827 !important;
-}
-
-#aq-sidebar .htime {
-  color: #6b7280 !important;
-}
-
-#aq-search-wrap {
-  background: rgba(0, 0, 0, 0.05) !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
-}
-#aq-search {
-  color: #111827 !important;
-}
-
-#aq-sidebar .new-qbtn {
-  background: #111827 !important;
-  color: #ffffff !important;
-  border-color: transparent !important;
-}
-
-#aq-sidebar .sb-orb3 {
-  opacity: 0.05 !important;
-}
-
-/* ── Sidebar DARK in dark mode ── */
-[data-theme="dark"] #aq-sidebar {
-  background: #0f172a !important;
-  border-right-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-[data-theme="dark"] #aq-sidebar .brand-name,
-[data-theme="dark"] #aq-sidebar .sb-section {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-[data-theme="dark"] #aq-sidebar .hbtn-sb {
-  color: rgba(255, 255, 255, 0.75) !important;
-  background: transparent !important;
-}
-[data-theme="dark"] #aq-sidebar .hbtn-sb:hover {
-  background: rgba(255, 255, 255, 0.06) !important;
-  color: #ffffff !important;
-}
-[data-theme="dark"] #aq-sidebar .hbtn-sb.active {
-  background: rgba(255, 255, 255, 0.09) !important;
-  color: #ffffff !important;
-}
-
-[data-theme="dark"] #aq-sidebar .htime {
-  color: rgba(255, 255, 255, 0.35) !important;
-}
-
-[data-theme="dark"] #aq-search-wrap {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-}
-[data-theme="dark"] #aq-search {
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-[data-theme="dark"] #aq-sidebar .new-qbtn {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #e2e8f0 !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-[data-theme="dark"] #aq-sidebar .sb-orb3 {
-  opacity: 1 !important;
-}
-/* icon tail  */
-
-/* ── Rail LIGHT in light mode ── */
-#aq-rail {
-  background: #ffffff !important;
-  border-right-color: rgba(0, 0, 0, 0.1) !important;
-}
-
-#aq-rail .rail-btn svg {
-  stroke: #374151 !important;
-}
-
-#aq-rail .rail-btn:hover {
-  background: rgba(0, 0, 0, 0.06) !important;
-}
-
-#aq-rail .rail-btn.active {
-  background: rgba(0, 0, 0, 0.09) !important;
-}
-
-#aq-rail .rail-divider {
-  background: rgba(0, 0, 0, 0.1) !important;
-}
-
-#aq-rail .rail-logo svg {
-  /* stroke: #374151 !important; */
-    stroke: #fff !important;
-}
-
-#aq-rail .rail-avatar {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
-  color: #ffffff !important;
-}
-
-/* ── Rail DARK in dark mode ── */
-[data-theme="dark"] #aq-rail {
-  background: #0f172a !important;
-  border-right-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-[data-theme="dark"] #aq-rail .rail-btn svg {
-  stroke: rgba(255, 255, 255, 0.6) !important;
-}
-
-[data-theme="dark"] #aq-rail .rail-btn:hover {
-  background: rgba(255, 255, 255, 0.06) !important;
-}
-
-[data-theme="dark"] #aq-rail .rail-btn.active {
-  background: rgba(255, 255, 255, 0.09) !important;
-}
-
-[data-theme="dark"] #aq-rail .rail-divider {
-  background: rgba(255, 255, 255, 0.08) !important;
-}
-
-[data-theme="dark"] #aq-rail .rail-logo svg {
-  stroke: rgba(255, 255, 255, 0.7) !important;
-}
- /* other css */
-/* ── Fix orbs covering search bar on focus ── */
-#aq-sidebar .sb-orb3,
-#aq-sidebar .sb-gem-bar {
-  pointer-events: none;
-  z-index: 0 !important;
-}
-
-#aq-search-wrap {
-  position: relative;
-  z-index: 2 !important;
-}
-
-#aq-search-wrap:focus-within {
-  background: rgba(0, 0, 0, 0.07) !important;
-  border-color: rgba(0, 0, 0, 0.18) !important;
-}
-
-/* Light mode */
-#aq-sidebar .sb-inner {
-  position: relative;
-  z-index: 1;
-}
-
-/* Dark mode fix */
-[data-theme="dark"] #aq-search-wrap:focus-within {
-  background: rgba(255, 255, 255, 0.09) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
-}
-
-/* ── Logo fix in light mode ── */
-#aq-sidebar .sb-brand .brand-name {
-  color: #111827 !important;
-}
-
-#aq-sidebar .sb-brand svg path,
-#aq-sidebar .sb-brand svg rect,
-#aq-sidebar .sb-brand svg circle,
-#aq-sidebar .sb-brand svg polygon {
-  stroke: #111827 !important;
-  fill: #111827 !important;
-}
-
-/* Dark mode — white rakho ── */
-[data-theme="dark"] #aq-sidebar .sb-brand .brand-name {
-  color: #ffffff !important;
-}
-
-[data-theme="dark"] #aq-sidebar .sb-brand svg path,
-[data-theme="dark"] #aq-sidebar .sb-brand svg rect,
-[data-theme="dark"] #aq-sidebar .sb-brand svg circle,
-[data-theme="dark"] #aq-sidebar .sb-brand svg polygon {
-  stroke: #ffffff !important;
-  fill: #ffffff !important;
-}
-
-</style>
-
 <div id="aq-shell">
 
   {{-- ════ ICON RAIL ════ --}}
@@ -295,15 +46,19 @@
 
     <div class="rail-divider"></div>
 
+    @if($isSuperAdmin)
     {{-- SQL panel --}}
     <button type="button" class="rail-btn" id="aq-rail-sql" data-tip="SQL & Results" aria-label="Toggle SQL panel">
       <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
     </button>
+    @endif
 
+    @if($isSuperAdmin)
     {{-- Export --}}
     <button type="button" class="rail-btn" id="aq-rail-export" data-tip="Export Excel" aria-label="Export to Excel">
       <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
     </button>
+    @endif
 
     <div class="rail-spacer"></div>
 
@@ -481,38 +236,40 @@
     </div>
 
     <div id="aq-bottom">
-      <details id="aq-adv">
-        <summary>
-          <svg id="aq-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
-          SQL &amp; Results
-          <span id="aq-rowbadge"></span>
-        </summary>
-        <div class="adv-body">
-          <div style="position:relative;">
-            <textarea id="aq-sql" rows="3" readonly placeholder="Generated SQL will appear here…"></textarea>
-            <button type="button" id="aq-copybtn" disabled
-              style="position:absolute;top:8px;right:8px;padding:3px 11px;border-radius:6px;font-size:11px;background:var(--bg);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all .14s;">
-              Copy
-            </button>
-          </div>
-          <div class="adv-actions">
-            <form id="aq-export-form" method="POST" action="{{ route('dashboard.analytics.export') }}" style="display:inline;">
-              @csrf
-              <input type="hidden" name="organization_id" id="aq-exp-org">
-              <input type="hidden" name="sql" id="aq-exp-sql">
-              <button type="submit" id="aq-expbtn" disabled class="abtn abtn-p">
-                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                Export to Excel
+      @if($isSuperAdmin)
+        <details id="aq-adv">
+          <summary>
+            <svg id="aq-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+            SQL &amp; Results
+            <span id="aq-rowbadge"></span>
+          </summary>
+          <div class="adv-body">
+            <div style="position:relative;">
+              <textarea id="aq-sql" rows="3" readonly placeholder="Generated SQL will appear here…"></textarea>
+              <button type="button" id="aq-copybtn" disabled
+                style="position:absolute;top:8px;right:8px;padding:3px 11px;border-radius:6px;font-size:11px;background:var(--bg);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all .14s;">
+                Copy
               </button>
-            </form>
-            <span id="aq-status"></span>
+            </div>
+            <div class="adv-actions">
+              <form id="aq-export-form" method="POST" action="{{ route('dashboard.analytics.export') }}" style="display:inline;">
+                @csrf
+                <input type="hidden" name="organization_id" id="aq-exp-org">
+                <input type="hidden" name="sql" id="aq-exp-sql">
+                <button type="submit" id="aq-expbtn" disabled class="abtn abtn-p">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                  Export to Excel
+                </button>
+              </form>
+              <span id="aq-status"></span>
+            </div>
+            <div id="aq-rtable-wrap">
+              <table><thead id="aq-thead"></thead><tbody id="aq-tbody"></tbody></table>
+            </div>
+            <p id="aq-empty"></p>
           </div>
-          <div id="aq-rtable-wrap">
-            <table><thead id="aq-thead"></thead><tbody id="aq-tbody"></tbody></table>
-          </div>
-          <p id="aq-empty"></p>
-        </div>
-      </details>
+        </details>
+      @endif
 
       @if(!$isSuperAdmin && $organizationMissing)
         <div class="warn-bar">
@@ -666,8 +423,8 @@
   });
 
   Q('aq-rail-new')?.addEventListener('click',()=>{startNewChat();});
-  Q('aq-rail-sql')?.addEventListener('click',()=>{adv.open=!adv.open;});
-  Q('aq-rail-export')?.addEventListener('click',()=>{if(!expBtn.disabled)Q('aq-export-form')?.submit();});
+  Q('aq-rail-sql')?.addEventListener('click',()=>{if(adv)adv.open=!adv.open;});
+  Q('aq-rail-export')?.addEventListener('click',()=>{if(expBtn && !expBtn.disabled)Q('aq-export-form')?.submit();});
   overlay?.addEventListener('click',()=>{sbOpen=false;applySB();});
   newBtn?.addEventListener('click',startNewChat);
 
@@ -718,13 +475,77 @@
   /* ── reset / new chat ── */
   function clearChat(){
     msgs.innerHTML='';welc.style.display='flex';
-    sqlEl.value='';expSql.value='';expOrg.value='';
-    copyBtn.disabled=true;expBtn.disabled=true;
+    if(sqlEl) sqlEl.value='';
+    if(expSql) expSql.value='';
+    if(expOrg) expOrg.value='';
+    if(copyBtn) copyBtn.disabled=true;
+    if(expBtn) expBtn.disabled=true;
     renderTable([],[]);
-    setMsg('',false);status.textContent='';badge.style.display='none';
+    setMsg('',false);status.textContent='';
+    if(badge) badge.style.display='none';
   }
   function reset(){clearChat();if(qEl){qEl.value='';resize();qEl.focus();}document.querySelectorAll('.hbtn-sb').forEach(b=>b.classList.remove('active'));}
   function startNewChat(){currentSessionId=null;reset();}
+
+  /* ── markdown parser ── */
+  function parseMarkdown(md) {
+    if (!md) return '';
+    // Escape HTML for safety
+    let text = md
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+      
+    const lines = text.split('\n');
+    let inList = false;
+    let htmlLines = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i].trim();
+      
+      // Check for list items
+      const listMatch = line.match(/^(?:\*|-|•)\s+(.*)/);
+      if (listMatch) {
+        if (!inList) {
+          htmlLines.push('<ul>');
+          inList = true;
+        }
+        let content = parseInlineMarkdown(listMatch[1]);
+        htmlLines.push(`<li>${content}</li>`);
+      } else {
+        if (inList) {
+          htmlLines.push('</ul>');
+          inList = false;
+        }
+        
+        // Headings
+        if (line.startsWith('### ')) {
+          htmlLines.push(`<h3>${parseInlineMarkdown(line.substring(4))}</h3>`);
+        } else if (line.startsWith('## ')) {
+          htmlLines.push(`<h2>${parseInlineMarkdown(line.substring(3))}</h2>`);
+        } else if (line.startsWith('# ')) {
+          htmlLines.push(`<h1>${parseInlineMarkdown(line.substring(2))}</h1>`);
+        } else if (line !== '') {
+          // Paragraph
+          htmlLines.push(`<p>${parseInlineMarkdown(line)}</p>`);
+        }
+      }
+    }
+    if (inList) {
+      htmlLines.push('</ul>');
+    }
+    return htmlLines.join('');
+  }
+
+  function parseInlineMarkdown(text) {
+    // Bold
+    let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Italic
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // Inline code
+    html = html.replace(/`(.*?)`/g, '<code>$1</code>');
+    return html;
+  }
 
   /* ── rich message bubble ── */
   const initials=@json($initials?:'U');
@@ -740,13 +561,51 @@
     bub.className='mbubble aq-ai-bubble';
 
     if(role==='user'){
-      bub.textContent=text;
+      const textSpan=document.createElement('span');
+      textSpan.textContent=text;
+      bub.appendChild(textSpan);
+      
+      const actions=document.createElement('div');
+      actions.className='user-msg-actions';
+      
+      const copyBtn=document.createElement('button');
+      copyBtn.type='button';
+      copyBtn.className='msg-action-btn';
+      copyBtn.title='Copy message';
+      copyBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+      copyBtn.addEventListener('click',async()=>{
+        try{
+          await navigator.clipboard.writeText(text);
+          const oldHtml = copyBtn.innerHTML;
+          copyBtn.style.color='var(--dot-color)';
+          copyBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          setTimeout(()=>{
+            copyBtn.style.color='';
+            copyBtn.innerHTML=oldHtml;
+          },1500);
+        }catch(err){
+          console.error(err);
+        }
+      });
+      
+      const editBtn=document.createElement('button');
+      editBtn.type='button';
+      editBtn.className='msg-action-btn';
+      editBtn.title='Edit message';
+      editBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+      editBtn.addEventListener('click',()=>{
+        qEl.value=text;
+        resize();
+        qEl.focus();
+      });
+      
+      actions.appendChild(copyBtn);
+      actions.appendChild(editBtn);
+      bub.appendChild(actions);
     } else {
       const rows=opts?.rows||[];
       const columns=opts?.columns||[];
       const aiText=opts?.ai_response||text||'';
-      const historyMode=opts?.historyMode||false;
-      const historyCount=opts?.rowCount||0;
       const sql=opts?.sql||'';
       const orgId=opts?.orgId||orgEl?.value||'';
       const question=opts?.question||'';
@@ -754,22 +613,17 @@
       const visualizationType=opts?.visualizationType||(wantsChart?'chart':'table');
       const visualizationData=opts?.visualizationData||null;
 
-      if(historyMode){
-        const p=document.createElement('p');
-        p.textContent=aiText||`Found ${historyCount} result(s). Open SQL panel to re-export.`;
-        bub.appendChild(p);
-        if(visualizationType==='chart'&&visualizationData){
-          bub.appendChild(buildChartElement(visualizationData));
-          bub.appendChild(buildPdfBtn(visualizationData,orgId,question||aiText||''));
-        } else if(sql&&historyCount>0){
-          bub.appendChild(buildExcelBtn(sql,orgId));
-        }
-      } else if(visualizationType==='chart'&&visualizationData){
-        if(aiText){const p=document.createElement('p');p.style.marginBottom='6px';p.style.fontWeight='600';p.textContent=aiText;bub.appendChild(p);}
+      if(aiText){
+        const div=document.createElement('div');
+        div.className='ai-response-text';
+        div.innerHTML=parseMarkdown(aiText);
+        bub.appendChild(div);
+      }
+
+      if(visualizationType==='chart'&&visualizationData){
         bub.appendChild(buildChartElement(visualizationData));
         bub.appendChild(buildPdfBtn(visualizationData,orgId,question||aiText||''));
       } else if(rows.length>0){
-        if(aiText){const p=document.createElement('p');p.style.marginBottom='6px';p.style.fontWeight='600';p.textContent=aiText;bub.appendChild(p);}
         const displayCols=columns.includes('S.No')||columns.includes('serial_number')?columns:['S.No',...columns];
         const wrap=document.createElement('div');wrap.className='ai-table-wrap';
         const table=document.createElement('table');table.className='ai-data-table';
@@ -783,8 +637,8 @@
         meta.textContent=`Showing ${rows.length} row(s) and ${columns.length} data column(s). Scroll sideways if more columns are off-screen.`;
         bub.appendChild(meta);
         if(sql)bub.appendChild(buildExcelBtn(sql,orgId));
-      } else {
-        bub.textContent=aiText||'No results found.';
+      } else if(!aiText) {
+        bub.innerHTML=parseMarkdown('No results found.');
       }
     }
 
@@ -838,17 +692,22 @@
 
   /* ── SQL-panel table ── */
   function renderTable(cols,rows){
+    if(!thead || !tbody) return;
     thead.innerHTML='';tbody.innerHTML='';
-    empty.style.display='none';rtable.style.display='none';badge.style.display='none';
-    if(!rows?.length){if(cols.length){empty.textContent='Query returned no rows.';empty.style.display='block';}return;}
-    rtable.style.display='block';
-    badge.textContent=rows.length+' row'+(rows.length!==1?'s':'');
-    badge.style.display='inline-block';
+    if(empty) empty.style.display='none';
+    if(rtable) rtable.style.display='none';
+    if(badge) badge.style.display='none';
+    if(!rows?.length){if(cols.length && empty){empty.textContent='Query returned no rows.';empty.style.display='block';}return;}
+    if(rtable) rtable.style.display='block';
+    if(badge) {
+      badge.textContent=rows.length+' row'+(rows.length!==1?'s':'');
+      badge.style.display='inline-block';
+    }
     const tr=document.createElement('tr');
     cols.forEach(c=>{const th=document.createElement('th');th.textContent=c;tr.appendChild(th);});
     thead.appendChild(tr);
     rows.forEach(row=>{const r=document.createElement('tr');cols.forEach(c=>{const td=document.createElement('td');td.textContent=row[c]??'';r.appendChild(td);});tbody.appendChild(r);});
-    if(!adv.open)adv.open=true;
+    if(adv && !adv.open)adv.open=true;
   }
 
   /* ── load session from history ── */
@@ -872,10 +731,10 @@
             if(msg.sql)lastSql=msg.sql;
             if(msg.is_conversation){
               appendMsg('assistant',msg.text||msg.ai_response);
-            } else if(msg.row_count>0){
+            } else if(msg.row_count>0 || (msg.rows && msg.rows.length>0)){
               appendMsg('assistant',null,{
-                historyMode:true,
-                rowCount:msg.row_count,
+                columns:msg.columns||[],
+                rows:msg.rows||[],
                 ai_response:msg.ai_response||msg.text,
                 sql:msg.sql||'',
                 orgId:data.organization_id||'',
@@ -888,10 +747,12 @@
             }
           }
         });
-        if(lastSql){
-          sqlEl.value=lastSql;expSql.value=lastSql;
-          expOrg.value=data.organization_id||'';
-          copyBtn.disabled=false;expBtn.disabled=false;
+        if(lastSql && sqlEl){
+          sqlEl.value=lastSql;
+          if(expSql) expSql.value=lastSql;
+          if(expOrg) expOrg.value=data.organization_id||'';
+          if(copyBtn) copyBtn.disabled=false;
+          if(expBtn) expBtn.disabled=false;
         }
         setEnabled(true);
       })
@@ -956,8 +817,8 @@
   function startCD(s){
     let r=Math.max(1,+s);setEnabled(false);
     if(cd)clearInterval(cd);
-    status.textContent='Please wait '+r+'s…';
-    cd=setInterval(()=>{r--;if(r<=0){clearInterval(cd);cd=null;status.textContent='';setEnabled(true);return;}status.textContent='Please wait '+r+'s…';},1000);
+    if(status) status.textContent='Please wait '+r+'s…';
+    cd=setInterval(()=>{r--;if(r<=0){clearInterval(cd);cd=null;if(status) status.textContent='';setEnabled(true);return;}if(status) status.textContent='Please wait '+r+'s…';},1000);
   }
 
   /* ── send ── */
@@ -966,7 +827,7 @@
     const q=qEl.value?.trim()||'',org=orgEl?.value||'';
     if(!q){setMsg('Please enter a question.',true);return;}
     if(isLoading)return;
-    setMsg('',false);setEnabled(false);status.textContent='';
+    setMsg('',false);setEnabled(false);if(status) status.textContent='';
     appendMsg('user',q);qEl.value='';resize();showTyping();
     try{
       const res=await fetch(askUrl,{
@@ -980,10 +841,10 @@
         setMsg(d.message||'Request failed.',true);
         const rs=+(d.retry_after_seconds||0);
         if(res.status===429&&rs>0)startCD(rs);
-        else{status.textContent='';setEnabled(true);}
+        else{if(status) status.textContent='';setEnabled(true);}
         return;
       }
-      status.textContent='';setMsg('',false);
+      if(status) status.textContent='';setMsg('',false);
 
       if(d.session_id)currentSessionId=d.session_id;
       if(d.is_new_session&&d.session_id){
@@ -991,14 +852,21 @@
       }
 
       if(d.is_conversation){
-        sqlEl.value='';expOrg.value='';expSql.value='';
-        copyBtn.disabled=true;expBtn.disabled=true;renderTable([],[]);
+        if(sqlEl) sqlEl.value='';
+        if(expOrg) expOrg.value='';
+        if(expSql) expSql.value='';
+        if(copyBtn) copyBtn.disabled=true;
+        if(expBtn) expBtn.disabled=true;
+        renderTable([],[]);
         appendMsg('assistant',d.message);
       } else {
         const cols=d.columns||[],rows=d.rows||[],raw=d.raw_sql||'';
         const aiResponse=d.ai_response||'';
-        sqlEl.value=raw;expOrg.value=org||'';expSql.value=raw;
-        copyBtn.disabled=false;expBtn.disabled=false;
+        if(sqlEl) sqlEl.value=raw;
+        if(expOrg) expOrg.value=org||'';
+        if(expSql) expSql.value=raw;
+        if(copyBtn) copyBtn.disabled=false;
+        if(expBtn) expBtn.disabled=false;
         renderTable(cols,rows);
         appendMsg('assistant',null,{
           columns:cols,
@@ -1014,7 +882,7 @@
       setEnabled(true);
       qEl?.focus();
     }catch(err){
-      console.error(err);removeTyping();status.textContent='';
+      console.error(err);removeTyping();if(status) status.textContent='';
       setMsg('Could not reach the server. Please try again.',true);setEnabled(true);
     }
   }

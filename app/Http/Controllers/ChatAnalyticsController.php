@@ -67,13 +67,34 @@ class ChatAnalyticsController extends Controller
 
             // AI message
             if ($query->sql) {
+                $rows = [];
+                $columns = $query->result_columns ?? [];
+                if ($query->row_count > 0 && $query->organization_id) {
+                    try {
+                        $org = Organization::find($query->organization_id);
+                        if ($org) {
+                            $this->databaseConnectionService->connectForOrganization($org);
+                            $results = DB::connection('dynamic_snd')->select($query->sql);
+                            $rows = array_map(static fn ($row) => (array) $row, $results);
+                            if (empty($columns) && !empty($rows)) {
+                                $columns = array_keys($rows[0]);
+                            }
+                        }
+                    } catch (\Throwable $e) {
+                        Log::error('Failed to re-execute query for history session', [
+                            'query_id' => $query->id,
+                            'error'    => $e->getMessage(),
+                        ]);
+                    }
+                }
+
                 $messages[] = [
                     'role'      => 'assistant',
                     'text'      => $query->ai_response ?: ($query->row_count > 0 ? "Found {$query->row_count} result(s)." : 'No results found.'),
                     'sql'       => $query->sql,
                     'row_count' => $query->row_count,
-                    'columns'   => $query->result_columns ?? [],
-                    'rows'      => [],   // we don't re-execute; JS will show count summary
+                    'columns'   => $columns,
+                    'rows'      => $rows,
                     'ai_response' => $query->ai_response,
                     'visualization_type' => $query->visualization_type ?: 'table',
                     'visualization_data' => $query->visualization_data,
@@ -268,10 +289,9 @@ class ChatAnalyticsController extends Controller
             $rows    = array_map(static fn ($row) => (array) $row, $results);
             $columns = empty($rows) ? [] : array_keys($rows[0]);
 
-            $aiResponse = $this->buildAssistantResultReply(
-                question: $validated['question'],
-                rowCount: count($rows),
-                columns: $columns,
+            $aiResponse = $this->aiService->generateDataSummary(
+                userPrompt: $validated['question'],
+                rows: $rows,
             );
             $visualization = $this->buildVisualizationPayload(
                 question: $validated['question'],

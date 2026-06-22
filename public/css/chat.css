@@ -686,3 +686,358 @@ main.mt-0,
 
 /* flash highlight used when jumping to the search field */
 .search-flash{animation:search-flash .5s ease;}
+
+  @keyframes pulse-dots {
+    0%,100%{opacity:.3;transform:scale(.8);}
+    50%{opacity:1;transform:scale(1.2);}
+  }
+  .tdot{animation:pulse-dots 1.4s infinite both;}
+  .tdot:nth-child(2){animation-delay:.2s;}
+  .tdot:nth-child(3){animation-delay:.4s;}
+  /* Data table inside bubble */
+  .ai-data-table{border-collapse:collapse;width:max-content;min-width:100%;font-size:.72rem;}
+  .ai-data-table th{background:rgba(0,0,0,.08);padding:6px 10px;text-align:left;white-space:nowrap;font-weight:600;}
+  .ai-data-table td{padding:5px 10px;border-top:1px solid rgba(0,0,0,.06);white-space:nowrap;}
+  .ai-table-wrap{overflow-x:auto;max-width:100%;border-radius:6px;margin-top:6px;border:1px solid rgba(0,0,0,.06);}
+  .ai-table-meta{margin-top:8px;font-size:.7rem;color:#6b7280;}
+  .ai-chart-wrap{width:min(720px,100%);height:340px;margin-top:10px;padding:12px;border:1px solid rgba(0,0,0,.06);border-radius:6px;background:rgba(255,255,255,.55);}
+  /* Bubble styles for AI rich messages */
+  .aq-ai-bubble{max-width:100%;word-break:break-word;}
+  .aq-export-btn{margin-top:10px;display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:7px;font-size:.75rem;font-weight:600;cursor:pointer;border:none;background:#111827;color:#fff;transition:opacity .14s;}
+  .aq-export-btn:hover{opacity:.85;}
+  .aq-export-btn+.aq-export-btn{margin-left:6px;}
+  #aq-hbtn,#aq-topbar .topbar-sep:first-of-type{display:none !important;}
+
+  
+  /* ── Remove ALL blue focus rings / outlines ── */
+  *:focus { outline: none !important; box-shadow: none !important; }
+  input:focus, textarea:focus, select:focus, button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  #aq-search:focus { outline: none !important; box-shadow: none !important; }
+  #aq-q:focus      { outline: none !important; box-shadow: none !important; }
+  #aq-search-wrap:focus-within {
+    border-color: rgba(255,255,255,.15) !important;
+    background: rgba(255,255,255,.07) !important;
+    box-shadow: none !important;
+  }
+  #aq-box:focus-within        { outline: none !important; box-shadow: none !important; }
+  #aq-box textarea:focus      { outline: none !important; box-shadow: none !important; }
+
+
+/* ── Sidebar LIGHT in light mode (default) ── */
+#aq-sidebar {
+  background: #ffffff !important;
+  border-right-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+#aq-sidebar .brand-name,
+#aq-sidebar .sb-section {
+  color: #111827 !important;
+}
+
+#aq-sidebar .hbtn-sb {
+  color: #374151 !important;
+  background: transparent !important;
+}
+#aq-sidebar .hbtn-sb:hover {
+  background: rgba(0, 0, 0, 0.06) !important;
+  color: #111827 !important;
+}
+#aq-sidebar .hbtn-sb.active {
+  background: rgba(0, 0, 0, 0.09) !important;
+  color: #111827 !important;
+}
+
+#aq-sidebar .htime {
+  color: #6b7280 !important;
+}
+
+#aq-search-wrap {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+#aq-search {
+  color: #111827 !important;
+}
+
+#aq-sidebar .new-qbtn {
+  background: #111827 !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+#aq-sidebar .sb-orb3 {
+  opacity: 0.05 !important;
+}
+
+/* ── Sidebar DARK in dark mode ── */
+[data-theme="dark"] #aq-sidebar {
+  background: #0f172a !important;
+  border-right-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] #aq-sidebar .brand-name,
+[data-theme="dark"] #aq-sidebar .sb-section {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="dark"] #aq-sidebar .hbtn-sb {
+  color: rgba(255, 255, 255, 0.75) !important;
+  background: transparent !important;
+}
+[data-theme="dark"] #aq-sidebar .hbtn-sb:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+}
+[data-theme="dark"] #aq-sidebar .hbtn-sb.active {
+  background: rgba(255, 255, 255, 0.09) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] #aq-sidebar .htime {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+[data-theme="dark"] #aq-search-wrap {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] #aq-search {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+[data-theme="dark"] #aq-sidebar .new-qbtn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] #aq-sidebar .sb-orb3 {
+  opacity: 1 !important;
+}
+/* icon tail  */
+
+/* ── Rail LIGHT in light mode ── */
+#aq-rail {
+  background: #ffffff !important;
+  border-right-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+#aq-rail .rail-btn svg {
+  stroke: #374151 !important;
+}
+
+#aq-rail .rail-btn:hover {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+#aq-rail .rail-btn.active {
+  background: rgba(0, 0, 0, 0.09) !important;
+}
+
+#aq-rail .rail-divider {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+#aq-rail .rail-logo svg {
+  /* stroke: #374151 !important; */
+    stroke: #fff !important;
+}
+
+#aq-rail .rail-avatar {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+  color: #ffffff !important;
+}
+
+/* ── Rail DARK in dark mode ── */
+[data-theme="dark"] #aq-rail {
+  background: #0f172a !important;
+  border-right-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] #aq-rail .rail-btn svg {
+  stroke: rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme="dark"] #aq-rail .rail-btn:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+[data-theme="dark"] #aq-rail .rail-btn.active {
+  background: rgba(255, 255, 255, 0.09) !important;
+}
+
+[data-theme="dark"] #aq-rail .rail-divider {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] #aq-rail .rail-logo svg {
+  stroke: rgba(255, 255, 255, 0.7) !important;
+}
+ /* other css */
+/* ── Fix orbs covering search bar on focus ── */
+#aq-sidebar .sb-orb3,
+#aq-sidebar .sb-gem-bar {
+  pointer-events: none;
+  z-index: 0 !important;
+}
+
+#aq-search-wrap {
+  position: relative;
+  z-index: 2 !important;
+}
+
+#aq-search-wrap:focus-within {
+  background: rgba(0, 0, 0, 0.07) !important;
+  border-color: rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Light mode */
+#aq-sidebar .sb-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Dark mode fix */
+[data-theme="dark"] #aq-search-wrap:focus-within {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* ── Logo fix in light mode ── */
+#aq-sidebar .sb-brand .brand-name {
+  color: #111827 !important;
+}
+
+#aq-sidebar .sb-brand svg path,
+#aq-sidebar .sb-brand svg rect,
+#aq-sidebar .sb-brand svg circle,
+#aq-sidebar .sb-brand svg polygon {
+  stroke: #111827 !important;
+  fill: #111827 !important;
+}
+
+/* Dark mode — white rakho ── */
+[data-theme="dark"] #aq-sidebar .sb-brand .brand-name {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] #aq-sidebar .sb-brand svg path,
+[data-theme="dark"] #aq-sidebar .sb-brand svg rect,
+[data-theme="dark"] #aq-sidebar .sb-brand svg circle,
+[data-theme="dark"] #aq-sidebar .sb-brand svg polygon {
+  stroke: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* ── AI Response Markdown Formatting ── */
+.ai-response-text {
+  width: 100%;
+}
+.ai-response-text h1, .aq-ai-bubble h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-top: 0.85rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+.ai-response-text h2, .aq-ai-bubble h2 {
+  font-size: 1.18rem;
+  font-weight: 650;
+  margin-top: 0.75rem;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+.ai-response-text h3, .aq-ai-bubble h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 0.65rem;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+.ai-response-text p, .aq-ai-bubble p {
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+}
+.ai-response-text ul, .aq-ai-bubble ul {
+  margin-left: 1.3rem;
+  margin-bottom: 0.6rem;
+  list-style-type: disc;
+}
+.ai-response-text li, .aq-ai-bubble li {
+  margin-bottom: 0.3rem;
+  line-height: 1.5;
+}
+.ai-response-text strong, .aq-ai-bubble strong {
+  font-weight: 600;
+  color: var(--text);
+}
+.ai-response-text code, .aq-ai-bubble code {
+  background: var(--bg-panel);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.88em;
+  color: var(--accent);
+}
+
+/* ── User Message Hover Actions ── */
+.mrow.user-r .mbubble {
+  position: relative;
+}
+.user-msg-actions {
+  position: absolute;
+  left: -70px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.95);
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.mrow.user-r:hover .user-msg-actions {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) scale(1);
+}
+.msg-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  padding: 0;
+}
+.msg-action-btn:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+.msg-action-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* On small screens, stack user actions below the bubble */
+@media (max-width: 767px) {
+  .user-msg-actions {
+    position: static;
+    transform: none !important;
+    margin-top: 6px;
+    justify-content: flex-end;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
