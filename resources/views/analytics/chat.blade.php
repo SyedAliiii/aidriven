@@ -142,12 +142,12 @@
     <div class="sb-inner">
 
       <div class="sb-top">
-        <div class="sb-brand">
+        {{-- <div class="sb-brand">
           <a href="{{ route('dashboard') }}" style="display:flex;align-items:center;flex-shrink:0;">
              <x-application-logo class="block h-7 w-auto fill-current text-gray-900 dark:text-white" />
           </a>
           <span class="brand-name">Analytics</span>
-        </div>
+        </div> --}}
         <button type="button" id="aq-newbtn" class="new-qbtn">
           <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
           New query
