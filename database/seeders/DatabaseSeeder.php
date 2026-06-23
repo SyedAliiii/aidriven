@@ -21,9 +21,9 @@ class DatabaseSeeder extends Seeder
     {
         // Idempotent dev seed: create if missing, otherwise reuse.
         $user = User::firstOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'admin@aidriven.com'],
             [
-                'name' => 'Test User',
+                'name' => 'Admin User',
                 'password' => Hash::make('password'),
             ]
         );
