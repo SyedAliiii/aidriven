@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout class="analytics-page">
 <link rel="stylesheet" href="{{ asset('css/chat.css') }}">
 @php
   $user = auth()->user();
@@ -14,41 +14,94 @@
   $exportUrl        = route('dashboard.analytics.export');
   $pdfUrl           = route('dashboard.analytics.pdf');
 @endphp
+
+<style>
+/* ══ MOBILE LAYOUT FIX ══ */
+@media (max-width: 639px) {
+
+  #aq-shell {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  #aq-main {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    width: 100vw !important;
+    overflow: hidden !important;
+  }
+
+  #aq-topbar {
+    flex-shrink: 0 !important;
+  }
+
+  #aq-scroll {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  #aq-bottom {
+    flex-shrink: 0 !important;
+    padding-bottom: env(safe-area-inset-bottom, 8px) !important;
+  }
+
+  #aq-q {
+    max-height: 100px !important;
+    overflow-y: auto !important;
+  }
+
+  #aq-inputwrap {
+    padding: 8px 10px !important;
+  }
+
+  #aq-hbtn {
+    display: none !important;
+  }
+
+  .chip-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+}
+</style>
+
 <div id="aq-shell">
 
   {{-- ════ ICON RAIL ════ --}}
   <nav id="aq-rail" aria-label="Quick actions">
 
-    {{-- Panel-left icon (replaces hamburger) --}}
-  <button type="button" class="rail-logo" id="aq-rail-hamburgertop"
-    aria-label="Toggle sidebar"
-    style="margin-bottom:2px;">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-      <rect id="aq-rail-l1" x="3" y="4" width="18" height="3.5" rx="1.75"
-      stroke="white" stroke-width="1.2" fill="none"
-      style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
-      <rect id="aq-rail-l2" x="3" y="10.25" width="18" height="3.5" rx="1.75"
-            stroke="white" stroke-width="1.2" fill="none"
-            style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
-      <rect id="aq-rail-l3" x="3" y="16.5" width="12" height="3.5" rx="1.75"
-            stroke="white" stroke-width="1.2" fill="none"
-            style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
-    </svg>
-  </button>
+    <button type="button" class="rail-logo" id="aq-rail-hamburgertop"
+      aria-label="Toggle sidebar"
+      style="margin-bottom:2px;">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+        <rect id="aq-rail-l1" x="3" y="4" width="18" height="3.5" rx="1.75"
+        stroke="white" stroke-width="1.2" fill="none"
+        style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
+        <rect id="aq-rail-l2" x="3" y="10.25" width="18" height="3.5" rx="1.75"
+              stroke="white" stroke-width="1.2" fill="none"
+              style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
+        <rect id="aq-rail-l3" x="3" y="16.5" width="12" height="3.5" rx="1.75"
+              stroke="white" stroke-width="1.2" fill="none"
+              style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
+      </svg>
+    </button>
 
     <div class="rail-divider"></div>
 
-    {{-- New query --}}
     <button type="button" class="rail-btn active" id="aq-rail-new" data-tip="New query" aria-label="New query">
       <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
     </button>
 
-    {{-- History --}}
     <button type="button" class="rail-btn" id="aq-rail-hist" data-tip="History" aria-label="History">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     </button>
 
-    {{-- Search --}}
     <button type="button" class="rail-btn" id="aq-rail-search" data-tip="Search queries" aria-label="Search queries">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
     </button>
@@ -56,14 +109,12 @@
     <div class="rail-divider"></div>
 
     @if($isSuperAdmin)
-    {{-- SQL panel --}}
     <button type="button" class="rail-btn" id="aq-rail-sql" data-tip="SQL & Results" aria-label="Toggle SQL panel">
       <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
     </button>
     @endif
 
     @if($isSuperAdmin)
-    {{-- Export --}}
     <button type="button" class="rail-btn" id="aq-rail-export" data-tip="Export Excel" aria-label="Export to Excel">
       <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
     </button>
@@ -71,13 +122,11 @@
 
     <div class="rail-spacer"></div>
 
-    {{-- Theme toggle --}}
     <button type="button" class="rail-btn" id="aq-rail-theme" data-tip="Toggle theme" aria-label="Toggle theme">
       <svg id="aq-theme-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       <svg id="aq-theme-moon" viewBox="0 0 24 24" style="display:none;"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
     </button>
 
-    {{-- Avatar + Dropdown --}}
     <div style="position:relative;z-index:1;" id="aq-user-wrap">
       <div class="rail-avatar" id="aq-user-btn" title="{{ $userName }}">{{ $initials ?: 'U' }}</div>
 
@@ -157,7 +206,6 @@
         </button>
       </div>
 
-      {{-- Search bar inside sidebar --}}
       <div style="padding:10px 14px 0;position:relative;z-index:1;">
         <div id="aq-search-wrap" style="display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);transition:border-color .15s,background .15s;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
@@ -383,7 +431,6 @@
   syncTheme();
   new MutationObserver(syncTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 
-  /* ── theme toggle rail btn ── */
   Q('aq-rail-theme')?.addEventListener('click',()=>{
     const isDark=document.documentElement.classList.toggle('dark');
     localStorage.setItem('theme',isDark?'dark':'light');
@@ -410,33 +457,27 @@
   }
   function openSidebar(){sbOpen=true;applySB();}
   hbtn?.addEventListener('click',()=>{sbOpen=!sbOpen;applySB();});
-  /* ── Rail hamburger animation ── */
-Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
-  const l1 = document.getElementById('aq-rail-l1');
-  const l2 = document.getElementById('aq-rail-l2');
-  const l3 = document.getElementById('aq-rail-l3');
-  if(!l1||!l2||!l3) return;
 
-  const btn = Q('aq-rail-hamburgertop');
-  btn.disabled = true;
+  Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
+    const l1 = document.getElementById('aq-rail-l1');
+    const l2 = document.getElementById('aq-rail-l2');
+    const l3 = document.getElementById('aq-rail-l3');
+    if(!l1||!l2||!l3) return;
+    const btn = Q('aq-rail-hamburgertop');
+    btn.disabled = true;
+    setTimeout(() => { l1.style.width = '0px'; }, 0);
+    setTimeout(() => { l2.style.width = '0px'; }, 80);
+    setTimeout(() => { l3.style.width = '0px'; }, 160);
+    setTimeout(() => { l3.style.width = '12px'; }, 280);
+    setTimeout(() => { l2.style.width = '18px'; }, 360);
+    setTimeout(() => { l1.style.width = '18px'; }, 440);
+    setTimeout(() => {
+      btn.disabled = false;
+      sbOpen = !sbOpen;
+      applySB();
+    }, 520);
+  });
 
-  // CLOSE: 1 → 2 → 3
-  setTimeout(() => { l1.style.width = '0px'; }, 0);
-  setTimeout(() => { l2.style.width = '0px'; }, 80);
-  setTimeout(() => { l3.style.width = '0px'; }, 160);
-
-  // OPEN: 3 → 2 → 1
-  setTimeout(() => { l3.style.width = '12px'; }, 280);
-  setTimeout(() => { l2.style.width = '18px'; }, 360);
-  setTimeout(() => { l1.style.width = '18px'; }, 440);
-
-  // Sidebar toggle
-  setTimeout(() => {
-    btn.disabled = false;
-    sbOpen = !sbOpen;
-    applySB();
-  }, 520);
-});
   Q('aq-rail-hist')?.addEventListener('click',openSidebar);
 
   Q('aq-rail-search')?.addEventListener('click',()=>{
@@ -529,42 +570,24 @@ Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
-      
     const lines = text.split('\n');
     let inList = false;
     let htmlLines = [];
-
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i].trim();
-      
       const listMatch = line.match(/^(?:\*|-|•)\s+(.*)/);
       if (listMatch) {
-        if (!inList) {
-          htmlLines.push('<ul>');
-          inList = true;
-        }
-        let content = parseInlineMarkdown(listMatch[1]);
-        htmlLines.push(`<li>${content}</li>`);
+        if (!inList) { htmlLines.push('<ul>'); inList = true; }
+        htmlLines.push(`<li>${parseInlineMarkdown(listMatch[1])}</li>`);
       } else {
-        if (inList) {
-          htmlLines.push('</ul>');
-          inList = false;
-        }
-        
-        if (line.startsWith('### ')) {
-          htmlLines.push(`<h3>${parseInlineMarkdown(line.substring(4))}</h3>`);
-        } else if (line.startsWith('## ')) {
-          htmlLines.push(`<h2>${parseInlineMarkdown(line.substring(3))}</h2>`);
-        } else if (line.startsWith('# ')) {
-          htmlLines.push(`<h1>${parseInlineMarkdown(line.substring(2))}</h1>`);
-        } else if (line !== '') {
-          htmlLines.push(`<p>${parseInlineMarkdown(line)}</p>`);
-        }
+        if (inList) { htmlLines.push('</ul>'); inList = false; }
+        if (line.startsWith('### ')) htmlLines.push(`<h3>${parseInlineMarkdown(line.substring(4))}</h3>`);
+        else if (line.startsWith('## ')) htmlLines.push(`<h2>${parseInlineMarkdown(line.substring(3))}</h2>`);
+        else if (line.startsWith('# ')) htmlLines.push(`<h1>${parseInlineMarkdown(line.substring(2))}</h1>`);
+        else if (line !== '') htmlLines.push(`<p>${parseInlineMarkdown(line)}</p>`);
       }
     }
-    if (inList) {
-      htmlLines.push('</ul>');
-    }
+    if (inList) htmlLines.push('</ul>');
     return htmlLines.join('');
   }
 
@@ -592,42 +615,25 @@ Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
       const textSpan=document.createElement('span');
       textSpan.textContent=text;
       bub.appendChild(textSpan);
-      
       const actions=document.createElement('div');
       actions.className='user-msg-actions';
-      
-      const copyBtn=document.createElement('button');
-      copyBtn.type='button';
-      copyBtn.className='msg-action-btn';
-      copyBtn.title='Copy message';
-      copyBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
-      copyBtn.addEventListener('click',async()=>{
+      const cpyBtn=document.createElement('button');
+      cpyBtn.type='button';cpyBtn.className='msg-action-btn';cpyBtn.title='Copy message';
+      cpyBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+      cpyBtn.addEventListener('click',async()=>{
         try{
           await navigator.clipboard.writeText(text);
-          const oldHtml = copyBtn.innerHTML;
-          copyBtn.style.color='var(--dot-color)';
-          copyBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-          setTimeout(()=>{
-            copyBtn.style.color='';
-            copyBtn.innerHTML=oldHtml;
-          },1500);
-        }catch(err){
-          console.error(err);
-        }
+          const oldHtml=cpyBtn.innerHTML;
+          cpyBtn.style.color='var(--dot-color)';
+          cpyBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          setTimeout(()=>{cpyBtn.style.color='';cpyBtn.innerHTML=oldHtml;},1500);
+        }catch(err){console.error(err);}
       });
-      
       const editBtn=document.createElement('button');
-      editBtn.type='button';
-      editBtn.className='msg-action-btn';
-      editBtn.title='Edit message';
+      editBtn.type='button';editBtn.className='msg-action-btn';editBtn.title='Edit message';
       editBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
-      editBtn.addEventListener('click',()=>{
-        qEl.value=text;
-        resize();
-        qEl.focus();
-      });
-      
-      actions.appendChild(copyBtn);
+      editBtn.addEventListener('click',()=>{qEl.value=text;resize();qEl.focus();});
+      actions.appendChild(cpyBtn);
       actions.appendChild(editBtn);
       bub.appendChild(actions);
     } else {
@@ -665,7 +671,7 @@ Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
         meta.textContent=`Showing ${rows.length} row(s) and ${columns.length} data column(s). Scroll sideways if more columns are off-screen.`;
         bub.appendChild(meta);
         if(sql)bub.appendChild(buildExcelBtn(sql,orgId));
-      } else if(!aiText) {
+      } else if(!aiText){
         bub.innerHTML=parseMarkdown('No results found.');
       }
     }
@@ -726,10 +732,7 @@ Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
     if(badge) badge.style.display='none';
     if(!rows?.length){if(cols.length && empty){empty.textContent='Query returned no rows.';empty.style.display='block';}return;}
     if(rtable) rtable.style.display='block';
-    if(badge) {
-      badge.textContent=rows.length+' row'+(rows.length!==1?'s':'');
-      badge.style.display='inline-block';
-    }
+    if(badge){badge.textContent=rows.length+' row'+(rows.length!==1?'s':'');badge.style.display='inline-block';}
     const tr=document.createElement('tr');
     cols.forEach(c=>{const th=document.createElement('th');th.textContent=c;tr.appendChild(th);});
     thead.appendChild(tr);
@@ -742,7 +745,7 @@ Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
     clearChat();
     currentSessionId=sessionId;
     const urlParams = new URLSearchParams(window.location.search);
-    if(urlParams.get('session') !== String(sessionId)) {
+    if(urlParams.get('session') !== String(sessionId)){
       history.pushState({ sessionId: sessionId }, '', '?session=' + sessionId);
     }
     showTyping();
@@ -785,6 +788,7 @@ Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
           if(expBtn) expBtn.disabled=false;
         }
         setEnabled(true);
+        window.dispatchEvent(new CustomEvent('aq-session-changed', { detail: { sessionId: sessionId } }));
       })
       .catch(()=>{
         removeTyping();
@@ -801,6 +805,10 @@ Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
       const btn=buildHistBtn(sessionId,title,createdAt,orgName);
       container.insertAdjacentElement('afterbegin',btn);
     });
+    // navbar ko bhi sync karo
+    window.dispatchEvent(new CustomEvent('aq-session-prepend', {
+      detail: { sessionId, title, createdAt, orgName }
+    }));
   }
 
   function buildHistBtn(sessionId,title,createdAt,orgName){
@@ -872,10 +880,10 @@ Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
       }
       if(status) status.textContent='';setMsg('',false);
 
-      if(d.session_id) {
+      if(d.session_id){
         currentSessionId=d.session_id;
         const urlParams = new URLSearchParams(window.location.search);
-        if(urlParams.get('session') !== String(d.session_id)) {
+        if(urlParams.get('session') !== String(d.session_id)){
           history.pushState({ sessionId: d.session_id }, '', '?session=' + d.session_id);
         }
       }
@@ -926,29 +934,45 @@ Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
     while(p&&p.tagName!=='BODY'){p.style.padding='0';p.style.margin='0';p=p.parentElement;}
   })();
 
-  function getUrlSessionId() {
+  function getUrlSessionId(){
     return new URLSearchParams(window.location.search).get('session');
   }
 
-  function handleUrlSession() {
-    const urlSessionId = getUrlSessionId();
-    if(urlSessionId) {
-      const sid = parseInt(urlSessionId, 10);
-      if(!isNaN(sid) && sid !== currentSessionId) {
-        currentSessionId = sid;
+  function handleUrlSession(){
+    const urlSessionId=getUrlSessionId();
+    if(urlSessionId){
+      const sid=parseInt(urlSessionId,10);
+      if(!isNaN(sid)&&sid!==currentSessionId){
+        currentSessionId=sid;
         loadSession(currentSessionId);
         document.querySelectorAll('.hbtn-sb').forEach(x=>x.classList.remove('active'));
         document.querySelectorAll(`.hbtn-sb[data-session-id="${currentSessionId}"]`).forEach(x=>x.classList.add('active'));
       }
     } else {
-      if(currentSessionId !== null) {
+      if(currentSessionId!==null){
         startNewChat();
       }
     }
   }
 
-  window.addEventListener('popstate', handleUrlSession);
-  setTimeout(handleUrlSession, 50);
+  window.addEventListener('popstate',handleUrlSession);
+  setTimeout(handleUrlSession,50);
+
+  /* ── Mobile: navbar se aane wale events — IIFE ke andar ── */
+  window.addEventListener('aq-new-chat',()=>{
+    startNewChat();
+  });
+
+  window.addEventListener('aq-load-session',(e)=>{
+    const sid=e.detail?.sessionId;
+    if(!sid)return;
+    currentSessionId=sid;
+    loadSession(sid);
+    document.querySelectorAll('.hbtn-sb').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll(`.hbtn-sb[data-session-id="${sid}"]`).forEach(x=>x.classList.add('active'));
+    window.dispatchEvent(new CustomEvent('aq-session-changed',{detail:{sessionId:sid}}));
+  });
+
 })();
 </script>
 </x-app-layout>

@@ -14,32 +14,36 @@
 
   /* ══ MOBILE: hide old rail + sidebar, show main full width ══ */
   @media(max-width:639px){
-    #aq-rail    { display:none !important; }
-    #aq-sidebar { display:none !important; }
-    #aq-mobile-overlay,
-    #aq-mobile-drawer { display:none !important; }
-    #aq-main{
-      display:flex !important;
-      flex-direction:column !important;
-      width:100vw !important;
-      max-width:100vw !important;
-      min-width:0 !important;
-      margin:0 !important;
-      padding:0 !important;
-      left:0 !important;
-      position:relative !important;
-    }
-    #aq-shell{
-      display:block !important;
-    }
+  #aq-rail    { display:none !important; }
+  #aq-sidebar { display:none !important; }
+  #aq-mobile-overlay,
+  #aq-mobile-drawer { display:none !important; }
+  #aq-main{
+    display:flex !important;
+    flex-direction:column !important;
+    width:100vw !important;
+    max-width:100vw !important;
+    min-width:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    left:0 !important;
+    position:relative !important;
   }
+  #aq-shell{
+    display:block !important;
+  }
+  /* Analytics page pe hamburger show karo */
+  body.analytics-page #aq-nav-hamburger {
+    display:flex !important;
+  }
+}
 
-  /* ══ DESKTOP: rail visible ══ */
-  @media(min-width:640px){
-    #aq-rail{ display:flex !important; }
-    #aq-nav-hamburger{ display:none !important; }
-    #aq-nav-menu-right{ display:none !important; }
-  }
+/* ══ DESKTOP: rail visible ══ */
+@media(min-width:640px){
+  #aq-rail{ display:flex !important; }
+  #aq-nav-hamburger{ display:none !important; visibility:hidden !important; pointer-events:none !important; }
+  #aq-nav-menu-right{ display:none !important; }
+}
 
   /* ── theme toggle ── */
   #aq-nav-theme{
@@ -69,13 +73,13 @@
   }
   #aq-nav-user-btn:hover{transform:scale(1.06);box-shadow:0 0 16px rgba(99,102,241,.5);}
 
-  /* ── left hamburger (mobile only) ── */
-  #aq-nav-hamburger{
-    width:36px;height:36px;border-radius:9px;
-    display:flex;align-items:center;justify-content:center;
-    background:transparent;border:none;cursor:pointer;
-    transition:background .15s;flex-shrink:0;
-  }
+ /* ── left hamburger (mobile only) ── */
+#aq-nav-hamburger{
+  width:36px;height:36px;border-radius:9px;
+  display:none;align-items:center;justify-content:center;
+  background:transparent;border:none;cursor:pointer;
+  transition:background .15s;flex-shrink:0;
+}
   #aq-nav-hamburger:hover{background:#f3f4f6;}
   .dark #aq-nav-hamburger:hover{background:rgba(255,255,255,.07);}
   #aq-nav-hamburger svg{
@@ -685,6 +689,7 @@ hamBtn?.addEventListener('click', () => {
   setTimeout(() => {
     hamBtn.disabled = false;
     openSidebar();
+    
   }, 520);
 });
   closeBtn?.addEventListener('click',closeSidebar);
@@ -734,5 +739,47 @@ hamBtn?.addEventListener('click', () => {
   document.addEventListener('keydown',(e)=>{
     if(e.key==='Escape'){ closeSidebar(); rightMenu?.classList.remove('open'); }
   });
+/* ── Analytics page pe hamburger force-show/hide (mobile) ── */
+ function updateHamburger(){
+    const ham = document.getElementById('aq-nav-hamburger');
+    if(!ham) return;
+    if(window.innerWidth < 640){
+      ham.style.removeProperty('visibility');
+      ham.style.removeProperty('pointer-events');
+      ham.style.setProperty('display', document.getElementById('aq-shell') ? 'flex' : 'none', 'important');
+    }
+  }
+  updateHamburger();
+  setTimeout(updateHamburger, 100);
+  setTimeout(updateHamburger, 500);
 })();
+
+
+// Jab main chat mein naya session bane, navbar history update karo
+  window.addEventListener('aq-session-prepend', (e) => {
+    const { sessionId, title, createdAt, orgName } = e.detail || {};
+    if (!sessionId) return;
+    const hist = document.getElementById('aq-nav-sb-hist');
+    if (!hist) return;
+    hist.querySelector('p')?.remove();
+    const existing = hist.querySelector(`.nav-hbtn[data-session-id="${sessionId}"]`);
+    if (existing) existing.remove();
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'nav-hbtn';
+    btn.dataset.sessionId = sessionId;
+    btn.dataset.q = title || '';
+    btn.title = title || '';
+    const short = (title || '').length > 46 ? title.substring(0, 46) + '…' : (title || '');
+    btn.innerHTML = short.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m])
+      + `<span class="nav-htime">${createdAt || ''}${orgName ? ' · ' + orgName : ''}</span>`;
+    btn.addEventListener('click', () => {
+      closeSidebar();
+      window.dispatchEvent(new CustomEvent('aq-load-session', { detail: { sessionId: parseInt(sessionId, 10) } }));
+      document.querySelectorAll('.nav-hbtn').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+    });
+    hist.insertAdjacentElement('afterbegin', btn);
+  });
+
 </script>
