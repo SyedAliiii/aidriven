@@ -19,13 +19,22 @@
   {{-- ════ ICON RAIL ════ --}}
   <nav id="aq-rail" aria-label="Quick actions">
 
-    {{-- Hamburger (replaces old chat logo) --}}
-    <button type="button" class=" rail-logo"  id="aq-rail-hamburgertop"
-      aria-label="Toggle sidebar"
-      style="margin-bottom:2px;"
-      onclick="document.getElementById('aq-hbtn').click()">
-      <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-    </button>
+    {{-- Panel-left icon (replaces hamburger) --}}
+  <button type="button" class="rail-logo" id="aq-rail-hamburgertop"
+    aria-label="Toggle sidebar"
+    style="margin-bottom:2px;">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+      <rect id="aq-rail-l1" x="3" y="4" width="18" height="3.5" rx="1.75"
+      stroke="white" stroke-width="1.2" fill="none"
+      style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
+      <rect id="aq-rail-l2" x="3" y="10.25" width="18" height="3.5" rx="1.75"
+            stroke="white" stroke-width="1.2" fill="none"
+            style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
+      <rect id="aq-rail-l3" x="3" y="16.5" width="12" height="3.5" rx="1.75"
+            stroke="white" stroke-width="1.2" fill="none"
+            style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
+    </svg>
+  </button>
 
     <div class="rail-divider"></div>
 
@@ -142,12 +151,6 @@
     <div class="sb-inner">
 
       <div class="sb-top">
-        {{-- <div class="sb-brand">
-          <a href="{{ route('dashboard') }}" style="display:flex;align-items:center;flex-shrink:0;">
-             <x-application-logo class="block h-7 w-auto fill-current text-gray-900 dark:text-white" />
-          </a>
-          <span class="brand-name">Analytics</span>
-        </div> --}}
         <button type="button" id="aq-newbtn" class="new-qbtn">
           <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
           New query
@@ -407,9 +410,35 @@
   }
   function openSidebar(){sbOpen=true;applySB();}
   hbtn?.addEventListener('click',()=>{sbOpen=!sbOpen;applySB();});
+  /* ── Rail hamburger animation ── */
+Q('aq-rail-hamburgertop')?.addEventListener('click', () => {
+  const l1 = document.getElementById('aq-rail-l1');
+  const l2 = document.getElementById('aq-rail-l2');
+  const l3 = document.getElementById('aq-rail-l3');
+  if(!l1||!l2||!l3) return;
+
+  const btn = Q('aq-rail-hamburgertop');
+  btn.disabled = true;
+
+  // CLOSE: 1 → 2 → 3
+  setTimeout(() => { l1.style.width = '0px'; }, 0);
+  setTimeout(() => { l2.style.width = '0px'; }, 80);
+  setTimeout(() => { l3.style.width = '0px'; }, 160);
+
+  // OPEN: 3 → 2 → 1
+  setTimeout(() => { l3.style.width = '12px'; }, 280);
+  setTimeout(() => { l2.style.width = '18px'; }, 360);
+  setTimeout(() => { l1.style.width = '18px'; }, 440);
+
+  // Sidebar toggle
+  setTimeout(() => {
+    btn.disabled = false;
+    sbOpen = !sbOpen;
+    applySB();
+  }, 520);
+});
   Q('aq-rail-hist')?.addEventListener('click',openSidebar);
 
-  /* ── search rail icon opens the sidebar and focuses the search field ── */
   Q('aq-rail-search')?.addEventListener('click',()=>{
     openSidebar();
     setTimeout(()=>{
@@ -453,7 +482,6 @@
     Q('aq-hist-empty')?.style && (Q('aq-hist-empty').style.display='none');
     if(searchEmpty)searchEmpty.style.display=(v&&!anyVisible)?'block':'none';
   });
-  /* neutral focus — no blue border */
   searchEl?.addEventListener('focus',()=>{if(searchWrap)searchWrap.style.borderColor='rgba(255,255,255,.15)';});
   searchEl?.addEventListener('blur', ()=>{if(searchWrap)searchWrap.style.borderColor='rgba(255,255,255,.08)';});
 
@@ -497,7 +525,6 @@
   /* ── markdown parser ── */
   function parseMarkdown(md) {
     if (!md) return '';
-    // Escape HTML for safety
     let text = md
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -510,7 +537,6 @@
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i].trim();
       
-      // Check for list items
       const listMatch = line.match(/^(?:\*|-|•)\s+(.*)/);
       if (listMatch) {
         if (!inList) {
@@ -525,7 +551,6 @@
           inList = false;
         }
         
-        // Headings
         if (line.startsWith('### ')) {
           htmlLines.push(`<h3>${parseInlineMarkdown(line.substring(4))}</h3>`);
         } else if (line.startsWith('## ')) {
@@ -533,7 +558,6 @@
         } else if (line.startsWith('# ')) {
           htmlLines.push(`<h1>${parseInlineMarkdown(line.substring(2))}</h1>`);
         } else if (line !== '') {
-          // Paragraph
           htmlLines.push(`<p>${parseInlineMarkdown(line)}</p>`);
         }
       }
@@ -545,11 +569,8 @@
   }
 
   function parseInlineMarkdown(text) {
-    // Bold
     let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Italic
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    // Inline code
     html = html.replace(/`(.*?)`/g, '<code>$1</code>');
     return html;
   }
@@ -697,7 +718,6 @@
   }
   function removeTyping(){typing?.remove();typing=null;}
 
-  /* ── SQL-panel table ── */
   function renderTable(cols,rows){
     if(!thead || !tbody) return;
     thead.innerHTML='';tbody.innerHTML='';
@@ -717,7 +737,6 @@
     if(adv && !adv.open)adv.open=true;
   }
 
-  /* ── load session from history ── */
   function loadSession(sessionId){
     if(isLoading)return;
     clearChat();
@@ -774,7 +793,6 @@
       });
   }
 
-  /* ── history sidebar items ── */
   function prependSession(sessionId,title,createdAt,orgName){
     [histC,mobHistC].forEach(container=>{
       if(!container)return;
@@ -817,14 +835,12 @@
   }
   document.querySelectorAll('.hbtn-sb').forEach(bindHistBtnClick);
 
-  /* ── copy SQL ── */
   copyBtn?.addEventListener('click',async()=>{
     if(!sqlEl.value)return;
     try{await navigator.clipboard.writeText(sqlEl.value);copyBtn.textContent='Copied!';setTimeout(()=>copyBtn.textContent='Copy',2000);}
     catch{setMsg('Could not copy.',true);}
   });
 
-  /* ── cooldown ── */
   function startCD(s){
     let r=Math.max(1,+s);setEnabled(false);
     if(cd)clearInterval(cd);
@@ -832,7 +848,6 @@
     cd=setInterval(()=>{r--;if(r<=0){clearInterval(cd);cd=null;if(status) status.textContent='';setEnabled(true);return;}if(status) status.textContent='Please wait '+r+'s…';},1000);
   }
 
-  /* ── send ── */
   sendBtn?.addEventListener('click',doSend);
   async function doSend(){
     const q=qEl.value?.trim()||'',org=orgEl?.value||'';
@@ -904,7 +919,6 @@
     }
   }
 
-  /* ── kill layout wrapper gap ── */
   (function(){
     var el=document.getElementById('aq-shell');
     if(!el)return;
@@ -912,7 +926,6 @@
     while(p&&p.tagName!=='BODY'){p.style.padding='0';p.style.margin='0';p=p.parentElement;}
   })();
 
-  /* ── popstate & onload session restore ── */
   function getUrlSessionId() {
     return new URLSearchParams(window.location.search).get('session');
   }
@@ -935,8 +948,6 @@
   }
 
   window.addEventListener('popstate', handleUrlSession);
-  
-  // Trigger on initial page load
   setTimeout(handleUrlSession, 50);
 })();
 </script>

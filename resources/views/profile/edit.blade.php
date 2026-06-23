@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="py-12">
+    <div class="px-4 py-8 sm:py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
 
             {{-- Page header --}}
@@ -12,7 +12,7 @@
                 </div>
                 <div>
                     <p class="text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">Account</p>
-                    <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Profile</h1>
+                    <h1 class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100">Profile</h1>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                         Manage your account information, password, and security.
                     </p>
@@ -20,16 +20,16 @@
             </div>
 
             {{-- Sections --}}
-            <div class="mt-6 space-y-5">
-                <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div class="mt-5 space-y-4">
+                <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                     @include('profile.partials.update-profile-information-form')
                 </div>
 
-                <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                     @include('profile.partials.update-password-form')
                 </div>
 
-                <div class="rounded-xl border border-red-100 bg-white p-6 shadow-sm dark:border-red-900/40 dark:bg-gray-900">
+                <div class="rounded-xl border border-red-100 bg-white p-4 sm:p-6 shadow-sm dark:border-red-900/40 dark:bg-gray-900">
                     @include('profile.partials.delete-user-form')
                 </div>
             </div>

@@ -1,6 +1,6 @@
 <x-app-layout>
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-8 sm:py-12">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {{-- Back link --}}
             <a href="{{ route('admin.organizations.index') }}"
@@ -19,21 +19,21 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Add organization</h1>
+                    <h1 class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100">Add organization</h1>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                         Connect an external database. The password is stored encrypted.
                     </p>
                 </div>
             </div>
 
-            <div class="mt-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div class="mt-5 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
                 <form method="POST" action="{{ route('admin.organizations.store') }}">
                     @csrf
 
                     {{-- Organization details --}}
-                    <div class="p-6">
+                    <div class="p-4 sm:p-6">
                         <div class="flex items-center gap-2 mb-4">
-                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <svg class="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
                             </svg>
                             <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Organization details</h2>
@@ -47,15 +47,16 @@
                     </div>
 
                     {{-- Database connection --}}
-                    <div class="border-t border-gray-100 p-6 dark:border-gray-800">
+                    <div class="border-t border-gray-100 p-4 sm:p-6 dark:border-gray-800">
                         <div class="flex items-center gap-2 mb-4">
-                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <svg class="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 17.25v-.228a4.5 4.5 0 0 0-.12-1.03l-2.268-9.64a3.375 3.375 0 0 0-3.285-2.602H7.923a3.375 3.375 0 0 0-3.285 2.602l-2.268 9.64a4.5 4.5 0 0 0-.12 1.03v.228m19.5 0a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3m19.5 0v.75A2.25 2.25 0 0 1 19.5 21h-15a2.25 2.25 0 0 1-2.25-2.25v-.75m19.5 0h-19.5" />
                             </svg>
                             <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Database connection</h2>
                         </div>
 
                         <div class="space-y-4">
+                            {{-- Host + Port --}}
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                 <div class="sm:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Host</label>
@@ -64,7 +65,6 @@
                                         value="{{ old('db_host') }}">
                                     @error('db_host')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                                 </div>
-
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Port</label>
                                     <input type="number" name="db_port"
@@ -74,6 +74,7 @@
                                 </div>
                             </div>
 
+                            {{-- DB name + Username --}}
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Database name</label>
@@ -82,7 +83,6 @@
                                         value="{{ old('db_database') }}">
                                     @error('db_database')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                                 </div>
-
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Username</label>
                                     <input type="text" name="db_username" required
@@ -92,6 +92,7 @@
                                 </div>
                             </div>
 
+                            {{-- Password --}}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Password</label>
                                 <div class="relative mt-1.5">
@@ -111,7 +112,7 @@
                                 </div>
                                 @error('db_password')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                                 <p class="mt-1.5 flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                                     </svg>
                                     Stored encrypted.
@@ -121,20 +122,20 @@
                     </div>
 
                     {{-- Status --}}
-                    <div class="border-t border-gray-100 p-6 dark:border-gray-800">
+                    <div class="border-t border-gray-100 p-4 sm:p-6 dark:border-gray-800">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Status</label>
                         <div class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1 dark:border-gray-700 dark:bg-gray-800/60">
                             <label class="cursor-pointer">
                                 <input type="radio" name="status" value="active" class="peer sr-only"
                                     @checked(old('status', 'active') === 'active')>
-                                <span class="block rounded-md px-4 py-1.5 text-sm font-medium text-gray-500 peer-checked:bg-green-50 peer-checked:text-green-700 dark:text-gray-400 dark:peer-checked:bg-green-900/30 dark:peer-checked:text-green-200">
+                                <span class="block rounded-md px-4 py-1.5 text-sm font-medium text-gray-500 peer-checked:bg-green-50 peer-checked:text-green-700 dark:text-gray-400 dark:peer-checked:bg-green-900/30 dark:peer-checked:text-green-200 transition">
                                     Active
                                 </span>
                             </label>
                             <label class="cursor-pointer">
                                 <input type="radio" name="status" value="inactive" class="peer sr-only"
                                     @checked(old('status') === 'inactive')>
-                                <span class="block rounded-md px-4 py-1.5 text-sm font-medium text-gray-500 peer-checked:bg-white peer-checked:text-gray-900 peer-checked:shadow-sm dark:text-gray-400 dark:peer-checked:bg-gray-700 dark:peer-checked:text-gray-100">
+                                <span class="block rounded-md px-4 py-1.5 text-sm font-medium text-gray-500 peer-checked:bg-white peer-checked:text-gray-900 peer-checked:shadow-sm dark:text-gray-400 dark:peer-checked:bg-gray-700 dark:peer-checked:text-gray-100 transition">
                                     Inactive
                                 </span>
                             </label>
@@ -143,7 +144,7 @@
                     </div>
 
                     {{-- Actions --}}
-                    <div class="flex items-center justify-between gap-3 border-t border-gray-100 p-6 dark:border-gray-800">
+                    <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-gray-100 p-4 sm:p-6 dark:border-gray-800">
                         <a href="{{ route('admin.organizations.index') }}"
                             class="inline-flex items-center justify-center rounded-md border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800/50 transition">
                             Cancel
