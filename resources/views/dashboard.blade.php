@@ -235,52 +235,89 @@ table.dq-t tbody tr:hover td{background:var(--surface-2);}
 .dq-empty{padding:40px;text-align:center;font-size:13px;color:var(--text-3);}
 
 /* ══════════════════════════════════════════
-   MOBILE CARD LIST — replaces table on mobile
+   MOBILE CARD LIST
 ══════════════════════════════════════════ */
-.dq-mob-list{display:none;flex-direction:column;gap:0;}
+.dq-mob-list{display:none;flex-direction:column;}
 .dq-mob-item{
-  padding:14px 16px;
-  border-bottom:1px solid var(--border-soft);
+  padding:18px 16px 16px;
+  position:relative;
+  background:var(--surface);
   transition:background .12s;
 }
-.dq-mob-item:last-child{border-bottom:none;}
+/* Separator — thicker, more visible */
+.dq-mob-item+.dq-mob-item{
+  border-top:2px solid var(--border);
+}
+/* left accent bar */
+.dq-mob-item::before{
+  content:'';
+  position:absolute;
+  left:0;top:18px;bottom:16px;
+  width:3px;border-radius:0 2px 2px 0;
+  background:linear-gradient(to bottom,var(--accent),var(--accent-2));
+  opacity:.5;
+}
 .dq-mob-item:active{background:var(--surface-2);}
 
-/* Question text */
+/* Serial number + question */
+.dq-mob-top{
+  display:flex;align-items:flex-start;gap:10px;
+  margin-bottom:12px;padding-left:10px;
+}
+.dq-mob-num{
+  font-size:10px;font-weight:700;color:var(--text-3);
+  font-family:var(--mono);
+  background:var(--bg);
+  border:1px solid var(--border-soft);
+  border-radius:5px;
+  padding:2px 6px;
+  flex-shrink:0;
+  margin-top:2px;
+}
 .dq-mob-q{
-  font-size:13.5px;font-weight:500;color:var(--text);
-  line-height:1.45;margin-bottom:10px;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  font-size:14px;font-weight:500;color:var(--text);
+  line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
   overflow:hidden;
 }
 
-/* Meta row */
+/* Meta chips row */
 .dq-mob-meta{
   display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+  padding-left:10px;
 }
 .dq-mob-tag{
   display:inline-flex;align-items:center;gap:4px;
-  padding:3px 9px;border-radius:6px;
-  font-size:11px;font-weight:500;
+  padding:4px 10px;border-radius:7px;
+  font-size:11.5px;font-weight:500;
   background:var(--surface-2);
   border:1px solid var(--border-soft);
   color:var(--text-2);
   white-space:nowrap;
 }
-.dq-mob-tag svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;}
+.dq-mob-tag svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;}
 .dq-mob-tag.rows{
   background:var(--accent-light);
   border-color:var(--accent-border);
   color:var(--accent);
   font-family:var(--mono);
+  font-weight:600;
 }
 .dq-mob-tag.time{
   color:var(--text-3);
   margin-left:auto;
+  font-size:11px;
+}
+
+/* No data */
+.dq-mob-empty{
+  padding:36px 16px;
+  text-align:center;
+  font-size:13px;
+  color:var(--text-3);
 }
 
 @media(max-width:600px){
-  /* Hide desktop table, show mobile cards */
   .dq-tscroll{display:none;}
   .dq-mob-list{display:flex;}
 }
@@ -443,7 +480,10 @@ table.dq-t tbody tr:hover td{background:var(--surface-2);}
     <div class="dq-mob-list">
       @forelse($recentQueries as $item)
         <div class="dq-mob-item">
-          <div class="dq-mob-q">{{ \Illuminate\Support\Str::limit($item->question, 120) }}</div>
+          <div class="dq-mob-top">
+            <span class="dq-mob-num">#{{ $loop->iteration }}</span>
+            <div class="dq-mob-q">{{ \Illuminate\Support\Str::limit($item->question, 120) }}</div>
+          </div>
           <div class="dq-mob-meta">
             {{-- User --}}
             <span class="dq-mob-tag">
@@ -467,7 +507,7 @@ table.dq-t tbody tr:hover td{background:var(--surface-2);}
           </div>
         </div>
       @empty
-        <div class="dq-empty">No activity yet.</div>
+        <div class="dq-mob-empty">No activity yet.</div>
       @endforelse
     </div>
 

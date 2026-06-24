@@ -724,9 +724,23 @@ main.mt-0,
 #aq-overlay.on{display:block;}
 
 @media(max-width:767px){
-  #aq-sidebar{position:fixed;left:var(--rail-width);top:3.5rem;height:calc(100vh - 3.5rem);z-index:22;}
-  #aq-rail{position:fixed;left:0;top:3.5rem;height:calc(100vh - 3.5rem);padding-top:14px;}
-  #aq-main{margin-left:var(--rail-width);}
+  #aq-sidebar{
+    position:fixed;
+    left:var(--rail-width);
+    top:0 !important;          /* 3.5rem ki jagah 0 */
+    height:100dvh !important;  /* calc se nahi, poori screen */
+    z-index:22;
+  }
+  #aq-rail{
+    position:fixed;
+    left:0;
+    top:0 !important;          /* 3.5rem ki jagah 0 */
+    height:100dvh !important;
+    padding-top:14px;
+  }
+  #aq-main{
+    margin-left:var(--rail-width);
+  }
 }
 
 .search-flash{animation:search-flash .5s ease;}

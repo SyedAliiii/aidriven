@@ -16,62 +16,38 @@
 @endphp
 
 <style>
-/* ══ MOBILE LAYOUT FIX ══ */
-@media (max-width: 639px) {
-
-  #aq-shell {
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100dvh !important;
-    overflow: hidden !important;
+@media(max-width:639px){
+  html,body{
+    overflow:hidden !important;
+    height:100% !important;
+    position:fixed !important;
+    width:100% !important;
   }
-
-  #aq-main {
-    display: flex !important;
-    flex-direction: column !important;
-    flex: 1 1 0 !important;
-    min-height: 0 !important;
-    width: 100vw !important;
-    overflow: hidden !important;
+  body>div,#app,[x-app-layout],
+  body>div>main,#app>main{
+    padding:0 !important;
+    margin:0 !important;
+    overflow:visible !important;
+    height:auto !important;
   }
-
-  #aq-topbar {
-    flex-shrink: 0 !important;
+  #aq-shell{
+    position:fixed !important;
+    top:0 !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    height:100dvh !important;
+    max-height:100dvh !important;
+    overflow:hidden !important;
   }
-
-  #aq-scroll {
-    flex: 1 1 0 !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  #aq-bottom {
-    flex-shrink: 0 !important;
-    padding-bottom: env(safe-area-inset-bottom, 8px) !important;
-  }
-
-  #aq-q {
-    max-height: 100px !important;
-    overflow-y: auto !important;
-  }
-
-  #aq-inputwrap {
-    padding: 8px 10px !important;
-  }
-
-  #aq-hbtn {
-    display: none !important;
-  }
-
-  .chip-grid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 8px !important;
-  }
+  #aq-q{font-size:16px !important;}
+  #aq-hbtn{display:none !important;}
+  .chip-grid{grid-template-columns:1fr 1fr !important;gap:8px !important;}
 }
 </style>
 
-<div id="aq-shell">  
+<div id="aq-shell">
+  
   {{-- ════ ICON RAIL ════ --}}
   <nav id="aq-rail" aria-label="Quick actions">
 
@@ -416,6 +392,21 @@
   const pdfUrl=@json($pdfUrl);
 
   let cd=null,typing=null,sbOpen=false,isLoading=false,currentSessionId=null;
+
+  /* ── Laravel parent wrappers reset (mobile) ── */
+  (function(){
+    if(window.innerWidth>639)return;
+    var el=document.getElementById('aq-shell');
+    if(!el)return;
+    var p=el.parentElement;
+    while(p&&p.tagName!=='BODY'){
+      p.style.padding='0';
+      p.style.margin='0';
+      p.style.overflow='visible';
+      p.style.height='auto';
+      p=p.parentElement;
+    }
+  })();
 
   /* ── theme sync ── */
   const sunIcon=Q('aq-theme-sun'),moonIcon=Q('aq-theme-moon');
@@ -804,7 +795,6 @@
       const btn=buildHistBtn(sessionId,title,createdAt,orgName);
       container.insertAdjacentElement('afterbegin',btn);
     });
-    // navbar ko bhi sync karo
     window.dispatchEvent(new CustomEvent('aq-session-prepend', {
       detail: { sessionId, title, createdAt, orgName }
     }));
@@ -926,13 +916,6 @@
     }
   }
 
-  (function(){
-    var el=document.getElementById('aq-shell');
-    if(!el)return;
-    var p=el.parentElement;
-    while(p&&p.tagName!=='BODY'){p.style.padding='0';p.style.margin='0';p=p.parentElement;}
-  })();
-
   function getUrlSessionId(){
     return new URLSearchParams(window.location.search).get('session');
   }
@@ -957,7 +940,6 @@
   window.addEventListener('popstate',handleUrlSession);
   setTimeout(handleUrlSession,50);
 
-  /* ── Mobile: navbar se aane wale events — IIFE ke andar ── */
   window.addEventListener('aq-new-chat',()=>{
     startNewChat();
   });
