@@ -340,7 +340,7 @@
         @endif
         <div id="aq-box">
           <textarea id="aq-q" rows="1"
-            placeholder="Ask anything — sales, revenue, KPIs…"
+            placeholder="Ask anything..."
             @if(!$isSuperAdmin && $organizationMissing) disabled @endif></textarea>
           <button type="button" id="aq-sendbtn"
             @if(!$isSuperAdmin && $organizationMissing) disabled @endif

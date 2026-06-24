@@ -630,7 +630,7 @@ main.mt-0,
 #aq-empty{display:none;font-size:12.5px;color:var(--text-faint);padding:4px 0;}
 
 /* input bar */
-#aq-inputwrap{max-width:740px;margin:0 auto;}
+#aq-inputwrap{max-width:740px;margin:0 auto;padding-top: 10px;}
 #aq-org-sel{
   width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border);
   background:var(--bg-sub);color:var(--text-muted);font-size:13px;outline:none;
@@ -638,7 +638,7 @@ main.mt-0,
 }
 #aq-org-sel:focus{border-color:var(--accent);}
 #aq-box{
-  display:flex;align-items:flex-end;gap:10px;padding:12px 15px;
+  display:flex;align-items:flex-end;gap:8px;padding:12px 15px;
   border-radius:14px;border:1px solid var(--border);background:var(--bg-sub);
   transition:border-color .18s,background .2s,box-shadow .18s;
   position:relative;
@@ -651,6 +651,7 @@ main.mt-0,
   flex:1;background:transparent;border:none;outline:none;
   font-size:14px;color:var(--text);line-height:1.65;
   resize:none;min-height:22px;max-height:160px;overflow-y:auto;font-family:inherit;
+  padding-right: 0; width: 0;
 }
 #aq-q::placeholder{color:var(--text-faint);}
 #aq-sendbtn{
