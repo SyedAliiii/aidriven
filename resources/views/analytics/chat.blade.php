@@ -1,4 +1,4 @@
-<x-app-layout class="analytics-page">
+<x-app-layout>
 <link rel="stylesheet" href="{{ asset('css/chat.css') }}">
 @php
   $user = auth()->user();
@@ -43,11 +43,90 @@
   #aq-q{font-size:16px !important;}
   #aq-hbtn{display:none !important;}
   .chip-grid{grid-template-columns:1fr 1fr !important;gap:8px !important;}
+
+  /* ── Mobile: custom topbar layout ── */
+  #aq-topbar{
+    display:flex !important;
+    align-items:center !important;
+    padding:0 8px 0 6px !important;
+    height:50px !important;
+    min-height:50px !important;
+    position:relative !important;
+    flex-shrink:0 !important;
+    
+  }
+ /* Mobile topbar text/icons color fix for light mode */
+  #aq-topbar-mob-center span {
+    color: #111827 !important;
+  }
+
+  #aq-topbar-mob-hamburger svg rect {
+    stroke: #6b7280 !important;
+  }
+
+  #aq-topbar-nav-dots {
+    color: #6b7280 !important;
+  }
+
+  #aq-topbar-theme-btn svg {
+    stroke: #6b7280 !important;
+  }
+
+  /* Dark mode icons back to light */
+  .dark #aq-topbar-mob-center span {
+    color: rgba(255,255,255,0.85) !important;
+  }
+
+  .dark #aq-topbar-mob-hamburger svg rect {
+    stroke: rgba(255,255,255,0.75) !important;
+  }
+
+  .dark #aq-topbar-nav-dots {
+    color: rgba(255,255,255,0.7) !important;
+  }
+
+  .dark #aq-topbar-theme-btn svg {
+    stroke: rgba(255,255,255,0.75) !important;
+  }
+  /* Hide desktop topbar elements on mobile */
+  #aq-topbar > .topbar-title { display:none !important; }
+  #aq-topbar > .topbar-sep   { display:none !important; }
+  #aq-topbar > #aq-hbtn      { display:none !important; }
+  #aq-topbar > .org-pill     { display:none !important; }
+
+ /* Show mobile topbar elements */
+  #aq-topbar-mob-left   { display:flex !important; }
+  #aq-topbar-mob-center { display:flex !important; }
+  #aq-topbar-mob-right  { display:flex !important; }
+  #aq-topbar-mob-logo   { display:flex !important; }
 }
+
+/* Desktop: hide custom mobile topbar elements */
+@media(min-width:640px){
+  #aq-topbar-mob-left    { display:none !important; }
+  #aq-topbar-mob-center  { display:none !important; }
+  #aq-topbar-mob-right   { display:none !important; }
+  #aq-topbar-mob-logo    { display:none !important; }
+}
+
+/* Fix 3: Chip text single line force */
+.q-chip{
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  font-size:12px !important;
+}
+@media(max-width:400px){
+  .chip-grid{
+    grid-template-columns:1fr !important;
+  }
+}
+
+
 </style>
 
 <div id="aq-shell">
-  
+
   {{-- ════ ICON RAIL ════ --}}
   <nav id="aq-rail" aria-label="Quick actions">
 
@@ -218,7 +297,70 @@
   {{-- ════ MAIN ════ --}}
   <div id="aq-main">
 
+    {{-- ════ TOPBAR ════ --}}
     <div id="aq-topbar">
+
+{{-- ── MOBILE LEFT: Hamburger ── --}}
+<div id="aq-topbar-mob-left" style="display:none;align-items:center;flex-shrink:0;">
+  <button type="button" id="aq-topbar-mob-hamburger" aria-label="Open history sidebar" style="
+    width:36px;height:36px;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent;border:none;cursor:pointer;
+    transition:background .15s;flex-shrink:0;padding:0;
+  ">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22" style="overflow:visible;">
+      <rect id="aq-tb-ham-l1" x="3" y="4"     width="18" height="3.5" rx="1.75"
+            stroke="rgba(255,255,255,.75)" stroke-width="1.2" fill="none"
+            style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
+      <rect id="aq-tb-ham-l2" x="3" y="10.25" width="18" height="3.5" rx="1.75"
+            stroke="rgba(255,255,255,.75)" stroke-width="1.2" fill="none"
+            style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
+      <rect id="aq-tb-ham-l3" x="3" y="16.5"  width="12" height="3.5" rx="1.75"
+            stroke="rgba(255,255,255,.75)" stroke-width="1.2" fill="none"
+            style="transition: width 0.1s cubic-bezier(.4,0,.2,1);"/>
+    </svg>
+  </button>
+</div>
+
+{{-- ── MOBILE CENTER: Title ── --}}
+<div id="aq-topbar-mob-center" style="display:none;align-items:center;gap:6px;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;pointer-events:none;">
+  <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.85);letter-spacing:-.01em;">AI Multi-DB Analytics</span>
+</div>
+
+{{-- Logo pinned to left (after hamburger) --}}
+<a href="{{ route('dashboard') }}" id="aq-topbar-mob-logo" style="display:none;align-items:center;flex-shrink:0;margin-left:4px;">
+  <x-application-logo style="height:16px;width:auto;" class="fill-current text-white" />
+</a>
+
+{{-- ── MOBILE RIGHT: Theme + Profile + Nav dots ── --}}
+<div id="aq-topbar-mob-right" style="display:none;align-items:center;gap:2px;margin-left:auto;flex-shrink:0;">
+  <button type="button" id="aq-topbar-theme-btn" class="aq-tb-icon-btn" title="Toggle theme" aria-label="Toggle theme">
+    <svg id="aq-topbar-theme-sun" viewBox="0 0 24 24" stroke="rgba(255,255,255,.75)" fill="none" width="18" height="18"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    <svg id="aq-topbar-theme-moon" viewBox="0 0 24 24" stroke="rgba(255,255,255,.75)" fill="none" width="18" height="18" style="display:none;"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+  </button>
+  <button type="button" id="aq-topbar-profile-btn" title="{{ $userName }}" style="
+    width:30px;height:30px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
+    border:2px solid rgba(165,180,252,.3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:700;color:#fff;
+    cursor:pointer;transition:transform .15s;margin:0 2px;
+  ">{{ $initials ?: 'U' }}</button>
+  <button type="button" id="aq-topbar-nav-dots" aria-label="Navigation menu" style="
+    width:32px;height:32px;border-radius:8px;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:transparent;border:none;cursor:pointer;
+    color:rgba(255,255,255,.7);transition:background .15s;padding:0;
+  ">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <circle cx="5" cy="12" r="1.5"/>
+      <circle cx="12" cy="12" r="1.5"/>
+      <circle cx="19" cy="12" r="1.5"/>
+    </svg>
+  </button>
+</div>
+
+      {{-- ── DESKTOP TOPBAR CONTENT ── --}}
       <button class="ib" id="aq-hbtn" title="Toggle sidebar">
         <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
       </button>
@@ -330,45 +472,12 @@
   </div>
 </div>
 
-{{-- Mobile history drawer --}}
-<div id="aq-mobile-overlay"
-     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(1px);z-index:40;"></div>
-
-<div id="aq-mobile-drawer"
-     style="display:flex;flex-direction:column;position:fixed;inset-y:0;left:0;width:310px;max-width:85vw;background:#0f172a;border-right:1px solid rgba(255,255,255,.08);z-index:50;transform:translateX(-100%);transition:transform .2s ease-out;">
-  <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-    <div>
-      <div style="font-size:13px;font-weight:600;color:#e2e8f0;">History</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.35);">Your recent chats</div>
-    </div>
-    <button type="button" id="aq-mob-close"
-            style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;border:none;background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);cursor:pointer;font-size:16px;">✕</button>
-  </div>
-  <div style="padding:10px 12px;flex-shrink:0;">
-    <button type="button" id="aq-mob-newbtn"
-            style="width:100%;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:#e2e8f0;font-size:12.5px;font-family:inherit;cursor:pointer;transition:background .14s;">+ New chat</button>
-  </div>
-  <div id="aq-mob-hist" style="flex:1;overflow-y:auto;padding:6px 8px;">
-    @forelse($sessions as $item)
-      <button type="button" class="hbtn-sb"
-        data-session-id="{{ $item->id }}"
-        data-q="{{ $item->title ?? $item->question ?? '' }}"
-        title="{{ $item->title ?? $item->question ?? '' }}">
-        {{ \Illuminate\Support\Str::limit($item->title ?? $item->question ?? '', 48) }}
-        <span class="htime">
-          {{ optional($item->created_at)->format('d M, H:i') }}
-          @if($item->organization) · {{ \Illuminate\Support\Str::limit($item->organization->name,12) }}@endif
-        </span>
-      </button>
-    @empty
-      <p id="aq-mob-hist-empty" style="font-size:12px;color:rgba(255,255,255,.28);padding:10px 11px;">No queries yet.</p>
-    @endforelse
-  </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function(){
+  // ── FIX: Add analytics-page class to body so navbar CSS works ──
+  document.body.classList.add('analytics-page');
+
   const Q=id=>document.getElementById(id);
   const shell=Q('aq-shell');
   const qEl=Q('aq-q'),orgEl=Q('organization_id'),sendBtn=Q('aq-sendbtn');
@@ -378,11 +487,8 @@
   const expBtn=Q('aq-expbtn'),expOrg=Q('aq-exp-org'),expSql=Q('aq-exp-sql');
   const thead=Q('aq-thead'),tbody=Q('aq-tbody'),empty=Q('aq-empty');
   const rtable=Q('aq-rtable-wrap'),badge=Q('aq-rowbadge'),histC=Q('aq-hist-cont');
-  const mobHistC=Q('aq-mob-hist');
   const sidebar=Q('aq-sidebar'),overlay=Q('aq-overlay'),hbtn=Q('aq-hbtn');
   const searchEl=Q('aq-search'),searchWrap=Q('aq-search-wrap'),searchEmpty=Q('aq-search-empty');
-  const mobOverlay=Q('aq-mobile-overlay'),mobDrawer=Q('aq-mobile-drawer');
-  const mobClose=Q('aq-mob-close'),mobNewBtn=Q('aq-mob-newbtn');
 
   const csrf=document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')||'';
   const askUrl=@json(route('dashboard.analytics.ask'));
@@ -408,26 +514,15 @@
     }
   })();
 
-  /* ── theme sync ── */
-  const sunIcon=Q('aq-theme-sun'),moonIcon=Q('aq-theme-moon');
-  function syncTheme(){
+  /* ── theme sync for shell data-theme attr ── */
+  function syncShellTheme(){
     const isDark=document.documentElement.classList.contains('dark');
     shell.setAttribute('data-theme',isDark?'dark':'');
-    if(sunIcon&&moonIcon){
-      sunIcon.style.display=isDark?'none':'block';
-      moonIcon.style.display=isDark?'block':'none';
-    }
   }
-  syncTheme();
-  new MutationObserver(syncTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+  syncShellTheme();
+  new MutationObserver(syncShellTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 
-  Q('aq-rail-theme')?.addEventListener('click',()=>{
-    const isDark=document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme',isDark?'dark':'light');
-    syncTheme();
-  });
-
-  /* ── user avatar dropdown ── */
+  /* ── user avatar dropdown (rail) ── */
   const userBtn=Q('aq-user-btn'),userMenu=Q('aq-user-menu');
   userBtn?.addEventListener('click',(e)=>{
     e.stopPropagation();
@@ -440,7 +535,7 @@
     }
   });
 
-  /* ── sidebar toggle ── */
+  /* ── desktop sidebar toggle (rail) ── */
   function applySB(){
     sidebar.classList.toggle('open',sbOpen);
     overlay.classList.toggle('on',sbOpen&&window.innerWidth<768);
@@ -487,19 +582,6 @@
   Q('aq-rail-export')?.addEventListener('click',()=>{if(expBtn && !expBtn.disabled)Q('aq-export-form')?.submit();});
   overlay?.addEventListener('click',()=>{sbOpen=false;applySB();});
   newBtn?.addEventListener('click',startNewChat);
-
-  /* ── mobile drawer ── */
-  function openMobileDrawer(){
-    if(mobDrawer)mobDrawer.style.transform='translateX(0)';
-    if(mobOverlay)mobOverlay.style.display='block';
-  }
-  function closeMobileDrawer(){
-    if(mobDrawer)mobDrawer.style.transform='translateX(-100%)';
-    if(mobOverlay)mobOverlay.style.display='none';
-  }
-  mobClose?.addEventListener('click',closeMobileDrawer);
-  mobOverlay?.addEventListener('click',closeMobileDrawer);
-  mobNewBtn?.addEventListener('click',()=>{closeMobileDrawer();startNewChat();});
 
   /* ── search filter ── */
   searchEl?.addEventListener('input',()=>{
@@ -788,7 +870,7 @@
   }
 
   function prependSession(sessionId,title,createdAt,orgName){
-    [histC,mobHistC].forEach(container=>{
+    [histC].forEach(container=>{
       if(!container)return;
       container.querySelector('p')?.remove();
       container.querySelector(`.hbtn-sb[data-session-id="${sessionId}"]`)?.remove();
@@ -818,7 +900,6 @@
       if(sid){
         currentSessionId=parseInt(sid,10);
         loadSession(currentSessionId);
-        closeMobileDrawer();
         document.querySelectorAll('.hbtn-sb').forEach(x=>x.classList.remove('active'));
         document.querySelectorAll(`.hbtn-sb[data-session-id="${sid}"]`).forEach(x=>x.classList.add('active'));
         if(window.innerWidth<768){sbOpen=false;applySB();}
@@ -953,7 +1034,31 @@
     document.querySelectorAll(`.hbtn-sb[data-session-id="${sid}"]`).forEach(x=>x.classList.add('active'));
     window.dispatchEvent(new CustomEvent('aq-session-changed',{detail:{sessionId:sid}}));
   });
+/* ── Rail theme toggle fix ── */
+const railThemeBtn = Q('aq-rail-theme');
+const railSun = Q('aq-theme-sun');
+const railMoon = Q('aq-theme-moon');
 
+function syncRailThemeIcons() {
+  const isDark = document.documentElement.classList.contains('dark');
+  if (railSun)  railSun.style.display  = isDark ? 'none'  : 'block';
+  if (railMoon) railMoon.style.display = isDark ? 'block' : 'none';
+}
+
+railThemeBtn?.addEventListener('click', () => {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  syncRailThemeIcons();
+  // shell ka data-theme bhi update karo
+  shell?.setAttribute('data-theme', isDark ? 'dark' : '');
+});
+
+syncRailThemeIcons();
+// Class change pe bhi sync karo
+new MutationObserver(syncRailThemeIcons).observe(
+  document.documentElement,
+  { attributes: true, attributeFilter: ['class'] }
+);
 })();
 </script>
 </x-app-layout>

@@ -4,7 +4,8 @@
   • Menu button RIGHT → smooth dropdown
   • Gradient borders everywhere
   • Light/dark sidebar
-  • Mobile: aq-rail + aq-sidebar hidden
+  • Mobile: on analytics page → navbar hidden, custom topbar shown inside #aq-topbar
+  • Mobile: on other pages → normal navbar shown
 --}}
 
 @once
@@ -14,36 +15,38 @@
 
   /* ══ MOBILE: hide old rail + sidebar, show main full width ══ */
   @media(max-width:639px){
-  #aq-rail    { display:none !important; }
-  #aq-sidebar { display:none !important; }
-  #aq-mobile-overlay,
-  #aq-mobile-drawer { display:none !important; }
-  #aq-main{
-    display:flex !important;
-    flex-direction:column !important;
-    width:100vw !important;
-    max-width:100vw !important;
-    min-width:0 !important;
-    margin:0 !important;
-    padding:0 !important;
-    left:0 !important;
-    position:relative !important;
+    #aq-rail    { display:none !important; }
+    #aq-sidebar { display:none !important; }
+    #aq-mobile-overlay,
+    #aq-mobile-drawer { display:none !important; }
+    #aq-main{
+      display:flex !important;
+      flex-direction:column !important;
+      width:100vw !important;
+      max-width:100vw !important;
+      min-width:0 !important;
+      margin:0 !important;
+      padding:0 !important;
+      left:0 !important;
+      position:relative !important;
+    }
+    #aq-shell{
+      display:block !important;
+    }
+    /* Analytics page pe navbar hide karo mobile per */
+    body.analytics-page #aq-navbar {
+      display:none !important;
+    }
   }
-  #aq-shell{
-    display:block !important;
-  }
-  /* Analytics page pe hamburger show karo */
-  body.analytics-page #aq-nav-hamburger {
-    display:flex !important;
-  }
-}
 
-/* ══ DESKTOP: rail visible ══ */
-@media(min-width:640px){
-  #aq-rail{ display:flex !important; }
-  #aq-nav-hamburger{ display:none !important; visibility:hidden !important; pointer-events:none !important; }
-  #aq-nav-menu-right{ display:none !important; }
-}
+  /* ══ DESKTOP: rail visible ══ */
+  @media(min-width:640px){
+    #aq-rail{ display:flex !important; }
+    #aq-nav-hamburger{ display:none !important; visibility:hidden !important; pointer-events:none !important; }
+    #aq-nav-menu-right{ display:none !important; }
+    /* Desktop per analytics page ka navbar dikhao */
+    body.analytics-page #aq-navbar { display:block !important; }
+  }
 
   /* ── theme toggle ── */
   #aq-nav-theme{
@@ -73,17 +76,17 @@
   }
   #aq-nav-user-btn:hover{transform:scale(1.06);box-shadow:0 0 16px rgba(99,102,241,.5);}
 
- /* ── left hamburger (mobile only) ── */
-#aq-nav-hamburger{
-  width:36px;height:36px;border-radius:9px;
-  display:none;align-items:center;justify-content:center;
-  background:transparent;border:none;cursor:pointer;
-  transition:background .15s;flex-shrink:0;
-}
+  /* ── left hamburger (mobile only) ── */
+  #aq-nav-hamburger{
+    width:36px;height:36px;border-radius:9px;
+    display:none;align-items:center;justify-content:center;
+    background:transparent;border:none;cursor:pointer;
+    transition:background .15s;flex-shrink:0;
+  }
   #aq-nav-hamburger:hover{background:#f3f4f6;}
   .dark #aq-nav-hamburger:hover{background:rgba(255,255,255,.07);}
   #aq-nav-hamburger svg{
-     width: 26px;height: 26px;border-radius: 6px;stroke:#6b7280;fill:none;
+     width:26px;height:26px;border-radius:6px;stroke:#6b7280;fill:none;
     stroke-width:2;stroke-linecap:round;
   }
   .dark #aq-nav-hamburger svg{stroke:#94a3b8;}
@@ -116,7 +119,6 @@
     transition:transform .25s cubic-bezier(.4,0,.2,1);
     display:flex;flex-direction:column;
     box-shadow:4px 0 32px rgba(0,0,0,.12);
-    /* gradient border on right */
     border-right:none;
   }
   .dark #aq-nav-sidebar-drawer{
@@ -297,18 +299,112 @@
     100% { background-position: 200% 0%; }
   }
 
-
   #aq-ham-l1, #aq-ham-l2, #aq-ham-l3 {
-  transition: width 0.25s cubic-bezier(.4,0,.2,1), 
-              x 0.25s cubic-bezier(.4,0,.2,1);
-  transform-origin: left center;
+    transition: width 0.25s cubic-bezier(.4,0,.2,1),
+                x 0.25s cubic-bezier(.4,0,.2,1);
+    transform-origin: left center;
+  }
+  #aq-ham-l1, #aq-ham-l2, #aq-ham-l3 {
+    transform-box: fill-box;
+  }
+  #aq-nav-menu-right circle {
+    transform-box: fill-box;
+    transform-origin: center center;
+  }
+
+  /* ══ AQ-TOPBAR mobile profile dropdown ══ */
+  #aq-topbar-profile-menu{
+    display:none;
+    position:fixed;
+    top:56px;
+    right:10px;
+    min-width:190px;
+    background:#1e293b;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,.55);
+    z-index:10000;
+  }
+
+#aq-topbar-nav-menu {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height .3s cubic-bezier(.4,0,.2,1), opacity .25s ease;
+  position: fixed;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: auto !important;
+  background: #ffffff;      /* light mode default */
+  border-top: none;
+  border-bottom: 1px solid #e5e7eb;
+  z-index: 9997;
 }
-#aq-ham-l1, #aq-ham-l2, #aq-ham-l3 {
-  transform-box: fill-box;
+
+.dark #aq-topbar-nav-menu {
+  background: #0d111c !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
 }
-#aq-nav-menu-right circle {
-  transform-box: fill-box;
-  transform-origin: center center;
+
+#aq-topbar-nav-menu.open {
+  max-height: 520px;
+  opacity: 1;
+}
+
+/* Light mode links */
+#aq-topbar-nav-menu a {
+  color: #374151 !important;
+}
+#aq-topbar-nav-menu a:hover {
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+/* Dark mode links */
+.dark #aq-topbar-nav-menu a {
+  color: rgba(255,255,255,.65) !important;
+}
+.dark #aq-topbar-nav-menu a:hover {
+  background: rgba(255,255,255,.07) !important;
+  color: #e2e8f0 !important;
+}
+  #aq-topbar-nav-menu::before{
+    content:'';
+    position:absolute;top:0;left:0;right:0;height:2px;
+    background: linear-gradient(
+      90deg,
+      #f97316, #ec4899, #8b5cf6, #06b6d4,
+      #f97316, #ec4899, #8b5cf6, #06b6d4
+    );
+    background-size: 200% 100%;
+    animation: aq-border-slide-h 3s linear infinite;
+    z-index:1;
+  }
+
+  /* ── Topbar icon buttons ── */
+  .aq-tb-icon-btn{
+    width:34px;height:34px;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent;border:none;cursor:pointer;
+    transition:background .15s;flex-shrink:0;padding:0;
+  }
+  .aq-tb-icon-btn:hover{background:rgba(255,255,255,.08);}
+  .aq-tb-icon-btn svg{width:18px;height:18px;fill:none;stroke-width:1.8;transition:stroke .15s;}
+  /* Fix 1: Light mode navbar border - gradient border sirf bottom pe */
+#aq-navbar::after {
+  display: none !important;
+}
+
+#aq-navbar {
+  background: #fff;
+  border-bottom: 1px solid #d1d5db !important;  /* light mode — thoda visible gray */
+}
+
+.dark #aq-navbar {
+  background: #030712;
+  border-bottom: 1px solid #1e293b !important;  /* dark mode — dark navy border */
 }
 </style>
 @endonce
@@ -398,28 +494,25 @@
   </div>
 </div>
 
-{{-- ══ NAVBAR ══ --}}
-<nav id="aq-navbar" class="sticky top-0 z-30 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800" style="position:relative;">
-
+{{-- ══ NAVBAR (hidden on mobile analytics page) ══ --}}
+<nav id="aq-navbar" class="sticky top-0 z-30 bg-white dark:bg-gray-950" style="position:relative;border-bottom:none;">
   <div class="mx-auto px-3 sm:px-4">
     <div class="flex items-center h-14 gap-2">
 
       {{-- LEFT: Hamburger (mobile only — opens history sidebar) --}}
-<button type="button" id="aq-nav-hamburger" aria-label="Open sidebar">
-  <svg id="aq-ham-svg" viewBox="0 0 24 24" fill="none" 
-       xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-       style="overflow:visible;">
-    <rect id="aq-ham-l1" x="3" y="4"     width="18" height="3.5" rx="1.75"
-          stroke="#6b7280" stroke-width="1.2" fill="none"
-          style="transform-origin:3px 5.75px; transition: transform 0.35s cubic-bezier(.4,0,.2,1);"/>
-    <rect id="aq-ham-l2" x="3" y="10.25" width="18" height="3.5" rx="1.75"
-          stroke="#6b7280" stroke-width="1.2" fill="none"
-          style="transform-origin:3px 12px; transition: transform 0.35s cubic-bezier(.4,0,.2,1);"/>
-    <rect id="aq-ham-l3" x="3" y="16.5"  width="12" height="3.5" rx="1.75"
-          stroke="#6b7280" stroke-width="1.2" fill="none"
-          style="transform-origin:3px 18.25px; transition: transform 0.35s cubic-bezier(.4,0,.2,1);"/>
-  </svg>
-</button>
+      <button type="button" id="aq-nav-hamburger" aria-label="Open sidebar">
+        <svg id="aq-ham-svg" viewBox="0 0 24 24" fill="none"
+             xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+             style="overflow:visible;">
+        <rect id="aq-tb-ham-l1" x="3" y="4" width="18" height="3.5" rx="1.75"
+              stroke="rgba(255,255,255,.75)" stroke-width="1.2" fill="none"/>
+        <rect id="aq-tb-ham-l2" x="3" y="10.25" width="18" height="3.5" rx="1.75"
+              stroke="rgba(255,255,255,.75)" stroke-width="1.2" fill="none"/>
+        <rect id="aq-tb-ham-l3" x="3" y="16.5" width="12" height="3.5" rx="1.75"
+              stroke="rgba(255,255,255,.75)" stroke-width="1.2" fill="none"/>
+        </svg>
+      </button>
+
       {{-- Logo --}}
       <a href="{{ route('dashboard') }}" class="flex items-center shrink-0">
         <x-application-logo class="block h-8 w-auto fill-current text-gray-800 dark:text-gray-100" />
@@ -506,11 +599,11 @@
 
         {{-- Mobile right menu button --}}
         <button id="aq-nav-menu-right" aria-label="Open nav menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <circle cx="5" cy="12" r="1.5"/>
-        <circle cx="12" cy="12" r="1.5"/>
-        <circle cx="19" cy="12" r="1.5"/>
-        </svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="5" cy="12" r="1.5"/>
+            <circle cx="12" cy="12" r="1.5"/>
+            <circle cx="19" cy="12" r="1.5"/>
+          </svg>
         </button>
       </div>
 
@@ -568,218 +661,301 @@
   </div>
 </nav>
 
+{{-- ══ MOBILE NAV DOTS MENU (for analytics page topbar) ══ --}}
+<div id="aq-topbar-nav-menu">
+  <div style="padding:12px 14px 16px;padding-bottom:max(16px,env(safe-area-inset-bottom));">
+    <a href="{{ route('dashboard') }}"
+      style="display:block;padding:10px 12px;border-radius:9px;font-size:13.5px;font-weight:500;color:{{ request()->routeIs('dashboard') && !request()->routeIs('dashboard.analytics.*') ? '#a5b4fc' : 'rgba(255,255,255,.65)' }};text-decoration:none;transition:background .13s,color .13s;"
+      onmouseover="this.style.background='rgba(255,255,255,.07)'"
+      onmouseout="this.style.background=''">
+      Dashboard
+    </a>
+    <a href="{{ route('dashboard.analytics') }}"
+      style="display:block;padding:10px 12px;border-radius:9px;font-size:13.5px;font-weight:500;color:{{ request()->routeIs('dashboard.analytics.*') ? '#a5b4fc' : 'rgba(255,255,255,.65)' }};text-decoration:none;transition:background .13s,color .13s;"
+      onmouseover="this.style.background='rgba(255,255,255,.07)'"
+      onmouseout="this.style.background=''">
+      Analytics
+    </a>
+    @if(Auth::user()?->hasRole('super-admin'))
+      <a href="{{ route('admin.organizations.index') }}"
+        style="display:block;padding:10px 12px;border-radius:9px;font-size:13.5px;font-weight:500;color:{{ request()->routeIs('admin.organizations.*') ? '#a5b4fc' : 'rgba(255,255,255,.65)' }};text-decoration:none;transition:background .13s,color .13s;"
+        onmouseover="this.style.background='rgba(255,255,255,.07)'"
+        onmouseout="this.style.background=''">
+        Organizations
+      </a>
+      <a href="{{ route('admin.users.index') }}"
+        style="display:block;padding:10px 12px;border-radius:9px;font-size:13.5px;font-weight:500;color:{{ request()->routeIs('admin.users.*') ? '#a5b4fc' : 'rgba(255,255,255,.65)' }};text-decoration:none;transition:background .13s,color .13s;"
+        onmouseover="this.style.background='rgba(255,255,255,.07)'"
+        onmouseout="this.style.background=''">
+        Users
+      </a>
+      <a href="{{ route('admin.ai-settings.edit') }}"
+        style="display:block;padding:10px 12px;border-radius:9px;font-size:13.5px;font-weight:500;color:{{ request()->routeIs('admin.ai-settings.*') ? '#a5b4fc' : 'rgba(255,255,255,.65)' }};text-decoration:none;transition:background .13s,color .13s;"
+        onmouseover="this.style.background='rgba(255,255,255,.07)'"
+        onmouseout="this.style.background=''">
+        AI Settings
+      </a>
+      <a href="{{ route('admin.ai-guide.edit') }}"
+        style="display:block;padding:10px 12px;border-radius:9px;font-size:13.5px;font-weight:500;color:{{ request()->routeIs('admin.ai-guide.*') ? '#a5b4fc' : 'rgba(255,255,255,.65)' }};text-decoration:none;transition:background .13s,color .13s;"
+        onmouseover="this.style.background='rgba(255,255,255,.07)'"
+        onmouseout="this.style.background=''">
+        AI Guide
+      </a>
+    @endif
+  </div>
+</div>
+
+{{-- ══ TOPBAR PROFILE DROPDOWN (for analytics page topbar) ══ --}}
+<div id="aq-topbar-profile-menu">
+  <div style="padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07);">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <div style="width:30px;height:30px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;border:2px solid rgba(165,180,252,.3);">{{ $navInitials ?: 'U' }}</div>
+      <div style="min-width:0;">
+        <div style="font-size:12.5px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;">{{ $navUserName }}</div>
+        @if($navUserOrg)
+          <div style="font-size:10.5px;color:rgba(255,255,255,.38);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;">{{ $navUserOrg->name }}</div>
+        @endif
+      </div>
+    </div>
+  </div>
+  <a href="{{ route('profile.edit') }}" style="display:flex;align-items:center;gap:9px;padding:10px 14px;font-size:12.5px;color:#94a3b8;text-decoration:none;transition:background .13s,color .13s;"
+     onmouseover="this.style.background='rgba(255,255,255,.06)';this.style.color='#e2e8f0'"
+     onmouseout="this.style.background='';this.style.color='#94a3b8'">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+  <div style="height:1px;background:rgba(255,255,255,.06);margin:0 10px;"></div>
+  <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+    @csrf
+    <button type="submit" style="display:flex;align-items:center;gap:9px;width:100%;padding:10px 14px;font-size:12.5px;color:#f87171;background:transparent;border:none;cursor:pointer;font-family:inherit;transition:background .13s;text-align:left;"
+      onmouseover="this.style.background='rgba(248,113,113,.08)'"
+      onmouseout="this.style.background=''">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Log Out
+    </button>
+  </form>
+</div>
+
 <script>
 (function(){
-  /* ── Theme ── */
-  function applyNavIcons(){
-    const isDark=document.documentElement.classList.contains('dark');
-    const sun=document.getElementById('aq-nav-theme-sun');
-    const moon=document.getElementById('aq-nav-theme-moon');
-    if(sun&&moon){sun.style.display=isDark?'none':'block';moon.style.display=isDark?'block':'none';}
-  }
-  function toggleTheme(){
-    const isDark=document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme',isDark?'dark':'light');
-    applyNavIcons();
-  }
-  document.getElementById('aq-nav-theme')?.addEventListener('click',toggleTheme);
-  applyNavIcons();
-  new MutationObserver(applyNavIcons).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+  function init(){
 
-  /* ── User dropdown ── */
-  const userBtn=document.getElementById('aq-nav-user-btn');
-  const userMenu=document.getElementById('aq-nav-user-menu');
-  const userWrap=document.getElementById('aq-nav-user-wrap');
-  userBtn?.addEventListener('click',(e)=>{
-    e.stopPropagation();
-    userMenu.style.display=userMenu.style.display==='block'?'none':'block';
-  });
-  document.addEventListener('click',(e)=>{
-    if(userMenu&&!userWrap?.contains(e.target)) userMenu.style.display='none';
-  });
-
-  /* ── Right mobile menu — smooth CSS class toggle ── */
-  const rightMenuBtn=document.getElementById('aq-nav-menu-right');
-  const rightMenu=document.getElementById('aq-nav-right-menu');
-rightMenuBtn?.addEventListener('click',(e)=>{
-  e.stopPropagation();
-
-  const dots = rightMenuBtn.querySelectorAll('circle');
-  if(!dots.length){ rightMenu.classList.toggle('open'); return; }
-
-  // already open ho tou seedha close
-  if(rightMenu.classList.contains('open')){
-    rightMenu.classList.remove('open');
-    return;
-  }
-
-  rightMenuBtn.disabled = true;
-
-  // Step 1: dots scatter bahar
-  dots[0].style.transition = 'transform 0.12s cubic-bezier(.4,0,.2,1)';
-  dots[1].style.transition = 'transform 0.12s cubic-bezier(.4,0,.2,1)';
-  dots[2].style.transition = 'transform 0.12s cubic-bezier(.4,0,.2,1)';
-
-  setTimeout(()=>{
-    dots[0].style.transform = 'translateY(-5px)';
-    dots[1].style.transform = 'scale(1.6)';
-    dots[2].style.transform = 'translateY(5px)';
-  }, 0);
-
-  // Step 2: wapas normal
-  setTimeout(()=>{
-    dots[0].style.transform = 'translateY(0)';
-    dots[1].style.transform = 'scale(1)';
-    dots[2].style.transform = 'translateY(0)';
-  }, 150);
-
-  // Step 3: menu open
-  setTimeout(()=>{
-    rightMenuBtn.disabled = false;
-    rightMenu.classList.add('open');
-  }, 280);
-});
-  document.addEventListener('click',(e)=>{
-    if(rightMenu&&rightMenuBtn&&!rightMenuBtn.contains(e.target)&&!rightMenu.contains(e.target)){
-      rightMenu.classList.remove('open');
+    function applyNavIcons(){
+      const isDark = document.documentElement.classList.contains('dark');
+      const sun  = document.getElementById('aq-nav-theme-sun');
+      const moon = document.getElementById('aq-nav-theme-moon');
+      if(sun && moon){ sun.style.display = isDark ? 'none' : 'block'; moon.style.display = isDark ? 'block' : 'none'; }
+      const tbSun  = document.getElementById('aq-topbar-theme-sun');
+      const tbMoon = document.getElementById('aq-topbar-theme-moon');
+      if(tbSun && tbMoon){ tbSun.style.display = isDark ? 'none' : 'block'; tbMoon.style.display = isDark ? 'block' : 'none'; }
     }
+    function toggleTheme(){
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      applyNavIcons();
+    }
+    document.getElementById('aq-nav-theme')?.addEventListener('click', toggleTheme);
+    document.getElementById('aq-topbar-theme-btn')?.addEventListener('click', toggleTheme);
+    applyNavIcons();
+    new MutationObserver(applyNavIcons).observe(document.documentElement, {attributes:true, attributeFilter:['class']});
+
+    const drawer   = document.getElementById('aq-nav-sidebar-drawer');
+    const overlay  = document.getElementById('aq-nav-sidebar-overlay');
+    const closeBtn = document.getElementById('aq-nav-sb-close');
+    const newBtn   = document.getElementById('aq-nav-sb-newbtn');
+
+    function openSidebar(){
+      drawer?.classList.add('open');
+      overlay?.classList.add('on');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar(){
+      drawer?.classList.remove('open');
+      overlay?.classList.remove('on');
+      document.body.style.overflow = '';
+    }
+
+function animateHamAndOpen(l1id, l2id, l3id, btnEl) {
+  const l1 = document.getElementById(l1id);
+  const l2 = document.getElementById(l2id);
+  const l3 = document.getElementById(l3id);
+  if (!l1 || !l2 || !l3) { openSidebar(); return; }
+  if (btnEl) btnEl.disabled = true;
+
+  const TR = 'width 0.13s cubic-bezier(.4,0,.2,1)';
+
+  // Pehle current width set karo taake animation shuru ho sake
+  ['18','18','12'].forEach((w, i) => {
+    const el = [l1,l2,l3][i];
+    el.style.transition = 'none';
+    el.style.width = w + 'px';
   });
 
-  /* ── Sidebar drawer ── */
-  const drawer=document.getElementById('aq-nav-sidebar-drawer');
-  const overlay=document.getElementById('aq-nav-sidebar-overlay');
-  const hamBtn=document.getElementById('aq-nav-hamburger');
-  const closeBtn=document.getElementById('aq-nav-sb-close');
-  const newBtn=document.getElementById('aq-nav-sb-newbtn');
+  // Force reflow
+  void l1.getBoundingClientRect();
 
-  function openSidebar(){
-    drawer?.classList.add('open');
-    overlay?.classList.add('on');
-    document.body.style.overflow='hidden';
-  }
-  function closeSidebar(){
-    drawer?.classList.remove('open');
-    overlay?.classList.remove('on');
-    document.body.style.overflow='';
-  }
+  // Gayab karo
+  [l1, l2, l3].forEach(el => el.style.transition = TR);
+  l1.style.width = '0px';
+  setTimeout(() => l2.style.width = '0px', 80);
+  setTimeout(() => l3.style.width = '0px', 160);
 
-  /* ── Hamburger animation then open ── */
-hamBtn?.addEventListener('click', () => {
-  const l1 = document.getElementById('aq-ham-l1');
-  const l2 = document.getElementById('aq-ham-l2');
-  const l3 = document.getElementById('aq-ham-l3');
+  // Wapas lao
+  setTimeout(() => l3.style.width = '12px', 310);
+  setTimeout(() => l2.style.width = '18px', 390);
+  setTimeout(() => l1.style.width = '18px', 470);
 
-  hamBtn.disabled = true;
-
-  l1.style.transition = 'width 0.1s cubic-bezier(.4,0,.2,1)';
-  l2.style.transition = 'width 0.1s cubic-bezier(.4,0,.2,1)';
-  l3.style.transition = 'width 0.1s cubic-bezier(.4,0,.2,1)';
-
-  // CLOSE: 1 → 2 → 3
-  setTimeout(() => { l1.style.width = '0px'; }, 0);
-  setTimeout(() => { l2.style.width = '0px'; }, 80);
-  setTimeout(() => { l3.style.width = '0px'; }, 160);
-
-  // OPEN: 3 → 2 → 1
-  setTimeout(() => { l3.style.width = '12px'; }, 280);
-  setTimeout(() => { l2.style.width = '18px'; }, 360);
-  setTimeout(() => { l1.style.width = '18px'; }, 440);
-
-  // SIDEBAR OPEN
   setTimeout(() => {
-    hamBtn.disabled = false;
+    if (btnEl) btnEl.disabled = false;
     openSidebar();
-    
-  }, 520);
-});
-  closeBtn?.addEventListener('click',closeSidebar);
-  overlay?.addEventListener('click',closeSidebar);
+  }, 570);
+}
 
-  newBtn?.addEventListener('click',()=>{
-    closeSidebar();
-    window.dispatchEvent(new CustomEvent('aq-new-chat'));
-  });
-
-  /* ── Sidebar search ── */
-  const sbSearch=document.getElementById('aq-nav-sb-search');
-  const sbSearchEmpty=document.getElementById('aq-nav-sb-search-empty');
-  sbSearch?.addEventListener('input',()=>{
-    const v=sbSearch.value.toLowerCase().trim();
-    let any=false;
-    document.querySelectorAll('#aq-nav-sb-hist .nav-hbtn').forEach(b=>{
-      const match=(b.dataset.q||'').toLowerCase().includes(v);
-      b.style.display=match?'block':'none';
-      if(match)any=true;
+    document.getElementById('aq-nav-hamburger')?.addEventListener('click', function(){
+      animateHamAndOpen('aq-ham-l1','aq-ham-l2','aq-ham-l3', this);
     });
-    const emptyEl=document.getElementById('aq-nav-sb-empty');
-    if(emptyEl) emptyEl.style.display='none';
-    if(sbSearchEmpty) sbSearchEmpty.style.display=(v&&!any)?'block':'none';
-  });
+    document.getElementById('aq-topbar-mob-hamburger')?.addEventListener('click', function(){
+      animateHamAndOpen('aq-tb-ham-l1','aq-tb-ham-l2','aq-tb-ham-l3', this);
+    });
 
-  /* ── History clicks ── */
-  document.querySelectorAll('#aq-nav-sb-hist .nav-hbtn').forEach(b=>{
-    b.addEventListener('click',()=>{
-      const sid=b.dataset.sessionId;
-      closeSidebar();
-      if(sid){
-        window.dispatchEvent(new CustomEvent('aq-load-session',{detail:{sessionId:parseInt(sid,10)}}));
-        document.querySelectorAll('.nav-hbtn').forEach(x=>x.classList.remove('active'));
-        b.classList.add('active');
+    closeBtn?.addEventListener('click', closeSidebar);
+    overlay?.addEventListener('click', closeSidebar);
+    newBtn?.addEventListener('click', () => { closeSidebar(); window.dispatchEvent(new CustomEvent('aq-new-chat')); });
+
+    const userBtn  = document.getElementById('aq-nav-user-btn');
+    const userMenu = document.getElementById('aq-nav-user-menu');
+    const userWrap = document.getElementById('aq-nav-user-wrap');
+    userBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(!userMenu) return;
+      userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', (e) => {
+      if(userMenu && !userWrap?.contains(e.target)) userMenu.style.display = 'none';
+    });
+
+    const tbProfileBtn  = document.getElementById('aq-topbar-profile-btn');
+    const tbProfileMenu = document.getElementById('aq-topbar-profile-menu');
+    const tbNavMenu     = document.getElementById('aq-topbar-nav-menu');
+
+    tbProfileBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(!tbProfileMenu) return;
+      const isOpen = tbProfileMenu.style.display === 'block';
+      tbNavMenu?.classList.remove('open');
+      tbProfileMenu.style.display = isOpen ? 'none' : 'block';
+    });
+    document.addEventListener('click', (e) => {
+      if(tbProfileMenu && !tbProfileBtn?.contains(e.target) && !tbProfileMenu.contains(e.target)){
+        tbProfileMenu.style.display = 'none';
       }
     });
-  });
 
-  window.addEventListener('aq-session-changed',e=>{
-    const sid=e.detail?.sessionId;
-    document.querySelectorAll('.nav-hbtn').forEach(x=>{
-      x.classList.toggle('active', sid && x.dataset.sessionId===String(sid));
+    const tbNavDotsBtn = document.getElementById('aq-topbar-nav-dots');
+    tbNavDotsBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(!tbNavMenu) return;
+      tbNavMenu.classList.toggle('open', !tbNavMenu.classList.contains('open'));
+      if(tbProfileMenu) tbProfileMenu.style.display = 'none';
     });
-  });
+    document.addEventListener('click', (e) => {
+      if(tbNavMenu && tbNavDotsBtn && !tbNavDotsBtn.contains(e.target) && !tbNavMenu.contains(e.target)){
+        tbNavMenu.classList.remove('open');
+      }
+    });
 
-  document.addEventListener('keydown',(e)=>{
-    if(e.key==='Escape'){ closeSidebar(); rightMenu?.classList.remove('open'); }
-  });
-/* ── Analytics page pe hamburger force-show/hide (mobile) ── */
- function updateHamburger(){
-    const ham = document.getElementById('aq-nav-hamburger');
-    if(!ham) return;
-    if(window.innerWidth < 640){
-      ham.style.removeProperty('visibility');
-      ham.style.removeProperty('pointer-events');
-      ham.style.setProperty('display', document.getElementById('aq-shell') ? 'flex' : 'none', 'important');
-    }
+    const rightMenuBtn = document.getElementById('aq-nav-menu-right');
+    const rightMenu    = document.getElementById('aq-nav-right-menu');
+    rightMenuBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(!rightMenu) return;
+      const dots = rightMenuBtn.querySelectorAll('circle');
+      if(!dots.length){ rightMenu.classList.toggle('open'); return; }
+      if(rightMenu.classList.contains('open')){ rightMenu.classList.remove('open'); return; }
+      rightMenuBtn.disabled = true;
+      dots.forEach(d => { d.style.transition = 'transform 0.12s cubic-bezier(.4,0,.2,1)'; });
+      setTimeout(()=>{ dots[0].style.transform='translateY(-5px)'; dots[1].style.transform='scale(1.6)'; dots[2].style.transform='translateY(5px)'; }, 0);
+      setTimeout(()=>{ dots[0].style.transform=''; dots[1].style.transform=''; dots[2].style.transform=''; }, 150);
+      setTimeout(()=>{ rightMenuBtn.disabled=false; rightMenu.classList.add('open'); }, 280);
+    });
+    document.addEventListener('click', (e) => {
+      if(rightMenu && rightMenuBtn && !rightMenuBtn.contains(e.target) && !rightMenu.contains(e.target)){
+        rightMenu.classList.remove('open');
+      }
+    });
+
+    const sbSearch      = document.getElementById('aq-nav-sb-search');
+    const sbSearchEmpty = document.getElementById('aq-nav-sb-search-empty');
+    sbSearch?.addEventListener('input', () => {
+      const v = sbSearch.value.toLowerCase().trim();
+      let any = false;
+      document.querySelectorAll('#aq-nav-sb-hist .nav-hbtn').forEach(b => {
+        const match = (b.dataset.q||'').toLowerCase().includes(v);
+        b.style.display = match ? 'block' : 'none';
+        if(match) any = true;
+      });
+      const emptyEl = document.getElementById('aq-nav-sb-empty');
+      if(emptyEl) emptyEl.style.display = 'none';
+      if(sbSearchEmpty) sbSearchEmpty.style.display = (v && !any) ? 'block' : 'none';
+    });
+
+    document.querySelectorAll('#aq-nav-sb-hist .nav-hbtn').forEach(b => {
+      b.addEventListener('click', () => {
+        const sid = b.dataset.sessionId;
+        closeSidebar();
+        if(sid){
+          window.dispatchEvent(new CustomEvent('aq-load-session', {detail:{sessionId: parseInt(sid,10)}}));
+          document.querySelectorAll('.nav-hbtn').forEach(x => x.classList.remove('active'));
+          b.classList.add('active');
+        }
+      });
+    });
+
+    window.addEventListener('aq-session-changed', e => {
+      const sid = e.detail?.sessionId;
+      document.querySelectorAll('.nav-hbtn').forEach(x => {
+        x.classList.toggle('active', sid && x.dataset.sessionId === String(sid));
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape'){
+        closeSidebar();
+        rightMenu?.classList.remove('open');
+        tbNavMenu?.classList.remove('open');
+        if(tbProfileMenu) tbProfileMenu.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('aq-session-prepend', (e) => {
+      const { sessionId, title, createdAt, orgName } = e.detail || {};
+      if(!sessionId) return;
+      const hist = document.getElementById('aq-nav-sb-hist');
+      if(!hist) return;
+      hist.querySelector('p')?.remove();
+      hist.querySelector(`.nav-hbtn[data-session-id="${sessionId}"]`)?.remove();
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'nav-hbtn';
+      btn.dataset.sessionId = sessionId; btn.dataset.q = title || ''; btn.title = title || '';
+      const short = (title||'').length > 46 ? title.substring(0,46)+'…' : (title||'');
+      const esc = s => String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+      btn.innerHTML = esc(short) + `<span class="nav-htime">${esc(createdAt||'')}${orgName?' · '+esc(orgName):''}</span>`;
+      btn.addEventListener('click', () => {
+        closeSidebar();
+        window.dispatchEvent(new CustomEvent('aq-load-session', {detail:{sessionId: parseInt(sessionId,10)}}));
+        document.querySelectorAll('.nav-hbtn').forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+      });
+      hist.insertAdjacentElement('afterbegin', btn);
+    });
+
+  } // end init()
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
-  updateHamburger();
-  setTimeout(updateHamburger, 100);
-  setTimeout(updateHamburger, 500);
+
 })();
-
-
-// Jab main chat mein naya session bane, navbar history update karo
-  window.addEventListener('aq-session-prepend', (e) => {
-    const { sessionId, title, createdAt, orgName } = e.detail || {};
-    if (!sessionId) return;
-    const hist = document.getElementById('aq-nav-sb-hist');
-    if (!hist) return;
-    hist.querySelector('p')?.remove();
-    const existing = hist.querySelector(`.nav-hbtn[data-session-id="${sessionId}"]`);
-    if (existing) existing.remove();
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'nav-hbtn';
-    btn.dataset.sessionId = sessionId;
-    btn.dataset.q = title || '';
-    btn.title = title || '';
-    const short = (title || '').length > 46 ? title.substring(0, 46) + '…' : (title || '');
-    btn.innerHTML = short.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m])
-      + `<span class="nav-htime">${createdAt || ''}${orgName ? ' · ' + orgName : ''}</span>`;
-    btn.addEventListener('click', () => {
-      closeSidebar();
-      window.dispatchEvent(new CustomEvent('aq-load-session', { detail: { sessionId: parseInt(sessionId, 10) } }));
-      document.querySelectorAll('.nav-hbtn').forEach(x => x.classList.remove('active'));
-      btn.classList.add('active');
-    });
-    hist.insertAdjacentElement('afterbegin', btn);
-  });
-
 </script>
