@@ -556,35 +556,43 @@ main.mt-0,
   line-height:1.6 !important;
 }
 
-.user-msg-actions{
-  position:static !important;
-  transform:none !important;
-  margin-top:5px !important;
-  justify-content:flex-end !important;
-  opacity:1 !important;
-  pointer-events:auto !important;
-  gap:6px !important;
-}
+@media(max-width:639px){
+  .user-msg-actions{
+    position:static !important;
+    transform:none !important;
+    margin-top:5px !important;
+    justify-content:flex-end !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    gap:6px !important;
+  }
 
-.msg-action-btn{
-  width:30px !important;
-  height:30px !important;
-  border-radius:8px !important;
-  background:rgba(255,255,255,.08) !important;
-  border:1px solid rgba(255,255,255,.12) !important;
-  color:rgba(255,255,255,.6) !important;
-}
+  .msg-action-btn{
+    width:30px !important;
+    height:30px !important;
+    border-radius:8px !important;
+    background:rgba(0,0,0,.05) !important;
+    border:1px solid rgba(0,0,0,.08) !important;
+    color:rgba(0,0,0,.5) !important;
+  }
 
-.msg-action-btn svg{
-  width:13px !important;
-  height:13px !important;
+  [data-theme="dark"] .msg-action-btn{
+    background:rgba(255,255,255,.08) !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+    color:rgba(255,255,255,.6) !important;
+  }
+
+  .msg-action-btn svg{
+    width:13px !important;
+    height:13px !important;
+  }
 }
 
 /* ── AI bubble ── */
 .mrow:not(.user-r) .mbubble{
   padding:4px 0 !important;
   font-size:14px !important;
-  color:#c8d3e8 !important;
+  color:var(--bubble-ai-color) !important;
   line-height:1.7 !important;
   max-width:calc(100vw - 80px) !important;
 }
@@ -594,8 +602,9 @@ main.mt-0,
   width:28px !important;
   height:28px !important;
   font-size:9px !important;
-  background:#1e2a42 !important;
-  border:1px solid rgba(255,255,255,.1) !important;
+  background:var(--bg-panel) !important;
+  border:1px solid var(--border) !important;
+  color:var(--text-muted) !important;
   flex-shrink:0 !important;
 }
 
@@ -847,7 +856,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none !important;box
 .ai-response-text code,.aq-ai-bubble code{background:var(--bg-panel);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:.88em;color:var(--accent);}
 
 /* ── User Message Actions ── */
-.mrow.user-r .mbubble{position:relative;}
+.mrow.user-r .mbubble{position:relative;overflow:visible !important;}
 .user-msg-actions{
   position:absolute;left:-70px;top:50%;
   transform:translateY(-50%) scale(.95);
